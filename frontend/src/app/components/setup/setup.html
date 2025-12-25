@@ -1,0 +1,83 @@
+<div class="min-h-screen bg-gray-950 flex flex-col items-center py-10 px-4 overflow-y-auto">
+  
+  <div class="max-w-5xl w-full bg-gray-900 rounded-2xl border border-gray-800 p-8 shadow-2xl">
+    
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-bold text-white mb-2">Protocolo Gênesis</h1>
+      <p class="text-gray-400">Configure seu agente para iniciar a simulação.</p>
+    </div>
+
+    <div class="mb-10 border-b border-gray-800 pb-8">
+      <label class="block text-sm font-bold text-blue-400 uppercase mb-3 tracking-wider">Passo 1: Identidade</label>
+      <input type="text" [(ngModel)]="nome" 
+             class="w-full bg-gray-950 border-2 border-gray-800 rounded-xl p-4 text-white text-lg focus:border-blue-600 outline-none transition-colors"
+             placeholder="Digite seu nome ou codinome...">
+    </div>
+
+    <div class="mb-10 border-b border-gray-800 pb-8">
+      <label class="block text-sm font-bold text-blue-400 uppercase mb-4 tracking-wider">Passo 2: Selecione seu Arquétipo</label>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <button *ngFor="let c of classes" (click)="selecionarClasse(c.id)"
+          class="relative group p-6 rounded-xl border-2 transition-all duration-300 text-left hover:-translate-y-1"
+          [class]="classeSelecionada === c.id 
+            ? c.cor + ' shadow-lg bg-gray-800 ring-2 ring-offset-2 ring-offset-gray-900 ring-' + c.cor.split('-')[1] + '-500'
+            : 'border-gray-800 bg-gray-950 hover:border-gray-600 opacity-60 hover:opacity-100'">
+          
+          <div class="text-4xl mb-4 grayscale group-hover:grayscale-0 transition-all">{{ c.icone }}</div>
+          <h3 class="text-xl font-bold text-white mb-2">{{ c.nome }}</h3>
+          <p class="text-xs text-gray-400 leading-relaxed">{{ c.desc }}</p>
+
+          <div *ngIf="classeSelecionada === c.id" class="absolute top-4 right-4 text-green-500">✅</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="mb-10">
+      <div class="flex justify-between items-end mb-4">
+        <label class="block text-sm font-bold text-blue-400 uppercase tracking-wider">Passo 3: Rotina Inicial</label>
+        <span class="text-xs text-gray-500">Selecione e ajuste o tempo</span>
+      </div>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        <div *ngFor="let t of tarefasDisponiveis" 
+             (click)="toggleTarefa(t)"
+             class="cursor-pointer border rounded-xl p-3 flex flex-col gap-2 transition-all select-none relative group"
+             [class]="t.selecionada 
+                ? 'bg-blue-900/20 border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.2)]' 
+                : 'bg-gray-950 border-gray-800 hover:border-gray-600 opacity-70 hover:opacity-100'">
+            
+            <div class="flex justify-between items-start">
+                <span class="text-2xl">{{ t.icone }}</span>
+                <div class="w-5 h-5 rounded border flex items-center justify-center transition-colors"
+                     [class]="t.selecionada ? 'bg-blue-500 border-blue-500' : 'border-gray-600'">
+                     <span *ngIf="t.selecionada" class="text-white text-xs font-bold">✓</span>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="font-bold text-gray-200 text-sm truncate">{{ t.nome }}</h4>
+                <span class="text-[10px] text-gray-500 font-mono uppercase">{{ t.atributo }}</span>
+            </div>
+
+            <div class="mt-2 pt-2 border-t border-gray-700/50 flex items-center gap-2" (click)="$event.stopPropagation()">
+                <span class="text-xs text-gray-500">Duração:</span>
+                <input type="number" [(ngModel)]="t.duracaoMinutos" 
+                       class="w-16 bg-gray-900 border border-gray-700 rounded px-1 text-xs text-white text-center focus:border-blue-500 outline-none"
+                       [disabled]="!t.selecionada">
+                <span class="text-xs text-gray-500">min</span>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-center pt-6 border-t border-gray-800">
+      <button (click)="confirmar()" 
+              [disabled]="!nome || !classeSelecionada"
+              class="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-800 disabled:text-gray-600 disabled:cursor-not-allowed text-white font-bold py-4 px-12 rounded-xl text-lg shadow-lg shadow-blue-900/20 transition-all active:scale-95 w-full md:w-auto">
+        INICIALIZAR SISTEMA 🚀
+      </button>
+    </div>
+
+  </div>
+</div>

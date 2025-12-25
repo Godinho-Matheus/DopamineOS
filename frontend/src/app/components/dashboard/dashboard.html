@@ -1,0 +1,138 @@
+<div *ngIf="!usuario" class="min-h-screen bg-gray-950 flex flex-col items-center justify-center text-white">
+    <h1 class="text-3xl font-bold mb-4">Carregando Neural Link...</h1>
+    <button (click)="carregarDados()" class="bg-blue-600 px-6 py-2 rounded font-bold hover:bg-blue-500">
+        Tentar Novamente
+    </button>
+</div>
+
+<div class="flex h-screen bg-gray-950 overflow-hidden" *ngIf="usuario">
+
+    <app-sidebar></app-sidebar>
+
+    <main class="flex-1 flex flex-col h-full relative">
+
+    <header class="bg-gray-900/50 p-4 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-gray-800 z-10">
+        <div class="flex items-center gap-4">
+        <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full flex items-center justify-center text-3xl shadow-lg ring-2 ring-gray-700">🧙‍♂️</div>
+        <div>
+            <h1 class="text-xl font-bold text-white">{{ usuario.nome }}</h1>
+            <p class="text-blue-400 text-sm font-semibold uppercase">{{ usuario.classe }} • Nível {{ usuario.nivel }}</p>
+        </div>
+        </div>
+
+        <div class="flex flex-col gap-2 w-full md:w-1/3">
+        <div class="flex items-center gap-2">
+            <div class="flex-1 relative h-4 bg-blue-950 rounded-full overflow-hidden border border-blue-900">
+                <div class="absolute inset-0 flex items-center justify-between px-2 text-[10px] font-bold text-blue-100 z-10">
+                    <span>🧠 {{usuario.mpAtual}}</span> <span>{{usuario.maxMp}}</span>
+                </div>
+                <div class="bg-blue-500 h-full shadow-[0_0_10px_#3b82f6] transition-all duration-500" [style.width.%]="(usuario.mpAtual / usuario.maxMp) * 100"></div>
+            </div>
+            <button (click)="curar()" class="bg-blue-900 hover:bg-blue-700 text-blue-200 text-[10px] px-2 py-0.5 rounded border border-blue-700">✨ Cura</button>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="flex-1 relative h-4 bg-red-950 rounded-full overflow-hidden border border-red-900">
+                <div class="absolute inset-0 flex items-center justify-between px-2 text-[10px] font-bold text-red-100 z-10">
+                    <span>❤️ {{usuario.hpAtual}}</span> <span>{{usuario.maxHp}}</span>
+                </div>
+                <div class="bg-red-500 h-full shadow-[0_0_10px_#ef4444] transition-all duration-500" [style.width.%]="(usuario.hpAtual / usuario.maxHp) * 100"></div>
+            </div>
+            <button (click)="tomarDano()" class="bg-red-900 hover:bg-red-700 text-red-200 text-[10px] px-2 py-0.5 rounded border border-red-700">🍕 Junk</button>
+        </div>
+        </div>
+    </header>
+
+    <div class="flex gap-4 px-6 pt-4 border-b border-gray-800 bg-gray-900/20 z-10">
+        <button (click)="viewMode = 'rotina'" [class]="'pb-2 px-4 font-bold border-b-2 transition-all ' + (viewMode === 'rotina' ? 'border-blue-500 text-white' : 'border-transparent text-gray-500 hover:text-gray-300')">📅 Rotina</button>
+        <button (click)="viewMode = 'status'" [class]="'pb-2 px-4 font-bold border-b-2 transition-all ' + (viewMode === 'status' ? 'border-blue-500 text-white' : 'border-transparent text-gray-500 hover:text-gray-300')">📊 Status</button>
+    </div>
+
+    <div class="flex-1 p-6 overflow-y-auto mb-10 pb-20 scrollbar-thin scrollbar-thumb-gray-800">
+        
+      <div *ngIf="viewMode === 'rotina'" class="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fadeIn">
+        
+        <div class="lg:col-span-8">
+            <h3 class="text-gray-400 text-xs font-bold uppercase mb-4 flex items-center gap-2"><span>⚔️</span> Missões Disponíveis</h3>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+                <button *ngFor="let p of protocolos" (click)="executar(p)"
+                        class="group bg-gray-900 hover:bg-gray-800 border border-gray-800 hover:border-blue-500 p-3 rounded-lg transition-all text-left flex flex-col gap-2 relative overflow-hidden active:scale-95 shadow-md">
+                    <div class="flex justify-between items-start w-full">
+                        <span class="text-2xl">{{ p.icone }}</span>
+                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border border-gray-700 text-gray-400 bg-gray-950/50">{{ p.dificuldade }}</span>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-200 text-sm group-hover:text-blue-400 truncate">{{ p.nome }}</h4>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[10px] text-gray-500 font-mono uppercase">{{ p.atributo }}</span>
+                            <span class="text-[10px] text-gray-600">• {{ p.duracaoMinutos || 15 }}m</span>
+                        </div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 shadow-lg">
+                <label class="text-xs text-gray-500 font-bold uppercase mb-2 block tracking-wider">Viajar no Tempo</label>
+                <input type="date" [value]="dataSelecionada" (change)="aoMudarData($event)" class="w-full bg-gray-950 border border-gray-700 text-white rounded-lg p-2 text-sm focus:border-blue-500 outline-none cursor-pointer">
+            </div>
+
+            <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-4 flex-1 flex flex-col shadow-lg min-h-[300px]">
+                <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+                    <h3 class="text-gray-400 text-xs font-bold uppercase">Diário</h3>
+                    <span class="text-xs bg-blue-900/20 text-blue-400 px-2 py-1 rounded border border-blue-500/30 font-mono">⏱️ {{ totalMinutosHoje }} min</span>
+                </div>
+                <div class="flex-1 overflow-y-auto max-h-[400px] pr-2 space-y-4">
+                    <div *ngFor="let log of historico" class="flex gap-3 relative pl-4 border-l-2 border-gray-800 hover:border-blue-500 transition-colors group">
+                        <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-gray-600 group-hover:bg-blue-500 transition-colors"></div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-baseline">
+                                <span class="text-sm font-bold text-gray-200">{{ log.protocolo.nome }}</span>
+                                <span class="text-[10px] text-gray-500 font-mono">{{ log.dataHora | date:'HH:mm' }}</span>
+                            </div>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-[10px] text-green-400">+{{ log.xpGanho }} XP</span>
+                                <span class="text-[10px] text-gray-500">⏳ {{ log.protocolo.duracaoMinutos || 15 }}m</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="historico.length === 0" class="flex flex-col items-center justify-center py-10 text-gray-600 text-sm gap-2 opacity-50">
+                        <span class="text-2xl">💤</span> <p>Nada por aqui.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+      <div *ngIf="viewMode === 'status'" class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fadeIn">
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 flex flex-col items-center justify-center relative min-h-[400px]">
+<h3 class="absolute top-4 left-4 text-gray-500 font-bold uppercase tracking-wider text-xs">Radar</h3>
+<apx-chart [series]="chartOptions.series" [chart]="chartOptions.chart" [xaxis]="chartOptions.xaxis" [stroke]="chartOptions.stroke" [fill]="chartOptions.fill" [markers]="chartOptions.markers" [yaxis]="chartOptions.yaxis" [theme]="chartOptions.theme"></apx-chart>
+        </div>
+        <div class="grid grid-cols-1 gap-4 content-start">
+<div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl flex items-center justify-between"><div class="flex items-center gap-4"><span class="text-3xl bg-gray-950 rounded-lg p-2">💪</span> <span class="text-xl text-gray-300 font-bold">Força</span></div><span class="text-3xl font-mono text-white">{{ usuario.forca }}</span></div>
+<div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl flex items-center justify-between"><div class="flex items-center gap-4"><span class="text-3xl bg-gray-950 rounded-lg p-2">🏃</span> <span class="text-xl text-gray-300 font-bold">Destreza</span></div><span class="text-3xl font-mono text-white">{{ usuario.destreza }}</span></div>
+<div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl flex items-center justify-between"><div class="flex items-center gap-4"><span class="text-3xl bg-gray-950 rounded-lg p-2">🧠</span> <span class="text-xl text-gray-300 font-bold">Intelecto</span></div><span class="text-3xl font-mono text-white">{{ usuario.intelecto }}</span></div>
+<div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl flex items-center justify-between"><div class="flex items-center gap-4"><span class="text-3xl bg-gray-950 rounded-lg p-2">🗣️</span> <span class="text-xl text-gray-300 font-bold">Carisma</span></div><span class="text-3xl font-mono text-white">{{ usuario.carisma }}</span></div>
+<div class="bg-gray-900 border border-gray-800 p-5 rounded-2xl flex items-center justify-between"><div class="flex items-center gap-4"><span class="text-3xl bg-gray-950 rounded-lg p-2">❤️</span> <span class="text-xl text-gray-300 font-bold">Constituição</span></div><span class="text-3xl font-mono text-white">{{ usuario.constituicao }}</span></div>
+        </div>
+</div>
+
+    </div>
+
+<footer class="absolute bottom-0 left-0 w-full bg-gray-900 p-2 border-t border-gray-800 z-20">
+<div class="relative w-full bg-gray-950 h-6 rounded-full overflow-hidden border border-gray-700">
+        
+        <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-green-500 to-emerald-400 transition-all duration-700" 
+             [style.width.%]="(usuario.xpAtual / usuario.xpParaProximoNivel) * 100">
+        </div>
+        
+        <div class="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-md tracking-wider">
+            ✨ XP: {{ usuario.xpAtual }} / {{ usuario.xpParaProximoNivel }} ✨
+        </div>
+</div>
+    </footer>
+
+</main>
+</div>
