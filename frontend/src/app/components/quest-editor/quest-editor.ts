@@ -24,7 +24,7 @@ export class QuestEditorComponent implements OnInit {
     dificuldade: 'EASY'
   };
 
-  // --- NOVO: PRESETS (Modelos Prontos) ---
+  // PRESETS (Modelos Prontos)
   presets = [
     { nome: 'Beber Água', icone: '💧', atributo: 'CONSTITUICAO', dificuldade: 'EASY' },
     { nome: 'Treino Pesado', icone: '🏋️', atributo: 'FORCA', dificuldade: 'HARD' },

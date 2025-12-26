@@ -12,7 +12,7 @@ export interface Protocolo {
   descricao?: string;
   atributo: 'FORCA' | 'DESTREZA' | 'INTELECTO' | 'CARISMA' | 'CONSTITUICAO';
   dificuldade: 'EASY' | 'MEDIUM' | 'HARD' | 'EPIC';
-  duracaoMinutos: number; 
+  duracaoMinutos: number;
 }
 
 export interface Usuario {
