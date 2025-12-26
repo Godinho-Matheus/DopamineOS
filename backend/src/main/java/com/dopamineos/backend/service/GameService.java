@@ -28,9 +28,7 @@ public class GameService {
     @Autowired
     private LogAtividadeRepository logAtividadeRepository;
 
-    /**
-     * Retorna o jogador principal (singleton pattern)
-     */
+    // Pega o jogador (cria um padrão se não existir)
     public Usuario pegarJogador() {
         List<Usuario> usuarios = usuarioRepository.findAll();
         if (usuarios.isEmpty()) {
@@ -39,9 +37,7 @@ public class GameService {
         return usuarios.get(0);
     }
 
-    /**
-     * Cria o jogador padrão com stats iniciais
-     */
+    // Cria um jogador padrão
     private Usuario criarJogadorPadrao() {
         Usuario novo = new Usuario();
         novo.setNome("Viajante");
@@ -61,16 +57,12 @@ public class GameService {
         return usuarioRepository.save(novo);
     }
 
-    /**
-     * Retorna o perfil do jogador como DTO
-     */
+    // Obtém o perfil do jogador
     public UsuarioDTO obterPerfil() {
         return converterParaDTO(pegarJogador());
     }
 
-    /**
-     * Retorna lista de protocolos disponíveis
-     */
+    // Lista todas as missões
     public List<ProtocoloDTO> listarProtocolos() {
         return protocoloRepository.findAll()
                 .stream()
@@ -78,18 +70,14 @@ public class GameService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Cria um novo protocolo
-     */
+    // Cria uma nova missão
     public ProtocoloDTO criarProtocolo(ProtocoloDTO dto) {
         Protocolo protocolo = converterDTOParaProtocolo(dto);
         Protocolo salvo = protocoloRepository.save(protocolo);
         return converterProtocoloParaDTO(salvo);
     }
 
-    /**
-     * Realiza check-in de um protocolo (completa missão)
-     */
+    // Completa missão
     public UsuarioDTO realizarCheckin(Long protocoloId) {
         Usuario jogador = pegarJogador();
         Protocolo protocolo = protocoloRepository.findById(protocoloId)
@@ -154,9 +142,7 @@ public class GameService {
         return converterParaDTO(atualizado);
     }
 
-    /**
-     * Configura o personagem (setup inicial)
-     */
+    // Setup inicial de personagem
     public UsuarioDTO configurarPersonagem(String nome, ClasseRPG classe) {
         Usuario jogador = pegarJogador();
         
@@ -202,9 +188,7 @@ public class GameService {
         return converterParaDTO(atualizado);
     }
 
-    /**
-     * Converte Usuario para DTO
-     */
+    // Converte Usuario para DTO
     private UsuarioDTO converterParaDTO(Usuario usuario) {
         return new UsuarioDTO(
                 usuario.getId(),
@@ -226,9 +210,7 @@ public class GameService {
         );
     }
 
-    /**
-     * Converte Protocolo para DTO
-     */
+    // Converte Protocolo para DTO
     private ProtocoloDTO converterProtocoloParaDTO(Protocolo protocolo) {
         return new ProtocoloDTO(
                 protocolo.getId(),
@@ -241,9 +223,7 @@ public class GameService {
         );
     }
 
-    /**
-     * Converte DTO para Protocolo
-     */
+    // Converte DTO para Protocolo
     private Protocolo converterDTOParaProtocolo(ProtocoloDTO dto) {
         Protocolo protocolo = new Protocolo();
         protocolo.setNome(dto.getNome());

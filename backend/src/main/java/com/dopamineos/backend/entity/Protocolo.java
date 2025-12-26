@@ -25,7 +25,7 @@ public class Protocolo {
     private int duracaoMinutos = 30;
 
     @Enumerated(EnumType.STRING)
-    private Atributo atributo; 
+    private Atributo atributo;
 
     @Enumerated(EnumType.STRING)
     private Dificuldade dificuldade;
