@@ -11,7 +11,7 @@ O **DopamineOS** é uma aplicação Fullstack que utiliza conceitos de RPG (Role
 ### Backend (API)
 - **Java 21**
 - **Spring Boot 4.0.1** (Web, JPA, Validation)
-- **Banco de Dados:** H2 (Memória/Dev) ou PostgreSQL (Prod)
+- **Banco de Dados:** PostgreSQL
 - **Maven** (Gerenciamento de dependências)
 
 ### Frontend (Client)
