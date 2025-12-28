@@ -5,19 +5,11 @@ public enum ClasseRPG {
     MAGO,
     LADINO;
 
-    // Método que define o bônus de XP baseado no atributo da tarefa
     public double getMultiplicador(Atributo atributo) {
-        switch (this) {
-            case GUERREIRO:
-                if (atributo == Atributo.FORCA || atributo == Atributo.CONSTITUICAO) return 1.3;
-                break;
-            case MAGO:
-                if (atributo == Atributo.INTELECTO) return 1.5;
-                break;
-            case LADINO:
-                if (atributo == Atributo.DESTREZA || atributo == Atributo.CARISMA) return 1.3;
-                break;
-        }
-        return 1.0;
+        return switch (this) {
+            case GUERREIRO -> (atributo == Atributo.FORCA || atributo == Atributo.CONSTITUICAO) ? 1.3 : 1.0;
+            case MAGO -> (atributo == Atributo.INTELECTO) ? 1.5 : 1.0;
+            case LADINO -> (atributo == Atributo.DESTREZA || atributo == Atributo.CARISMA) ? 1.3 : 1.0;
+        };
     }
 }
