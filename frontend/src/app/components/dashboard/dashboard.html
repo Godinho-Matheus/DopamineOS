@@ -145,7 +145,7 @@
                                 <div class="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-gray-600 group-hover:bg-blue-500 transition-colors shadow-[0_0_5px_currentColor]"></div>
                                 <div class="flex-1">
                                     <div class="flex justify-between items-start">
-                                        <span class="text-sm font-bold text-gray-300 group-hover:text-white">{{ log.protocolo.nome }}</span>
+                                        <span class="text-sm font-bold text-gray-300 group-hover:text-white">{{ log.nomeMissao }}</span>
                                         <span class="text-[10px] text-gray-600 font-mono">{{ log.dataHora | date:'HH:mm' }}</span>
                                     </div>
                                     <div class="flex items-center gap-3 mt-1">
@@ -153,7 +153,7 @@
                                             <span>+XP</span>
                                         </span>
                                         <span class="text-[10px] text-gray-500">
-                                            ⏳ {{ log.protocolo.duracaoMinutos || 15 }}m
+                                            ⏳ {{ log.duracaoMinutos }}m
                                         </span>
                                     </div>
                                 </div>

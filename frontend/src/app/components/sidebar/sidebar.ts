@@ -25,6 +25,11 @@ export class SidebarComponent {
       icon: '📜',
       exact: false
     },
+    { label: 'Histórico',
+      path: '/history',
+      icon: '⏳',
+      exact: true
+    }
     // Futuras expansões:
     // { label: 'Loja & Inventário', path: '/shop', icon: '💰' },
     // { label: 'Conquistas', path: '/achievements', icon: '🏆' },

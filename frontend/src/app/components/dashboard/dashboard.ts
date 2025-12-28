@@ -121,13 +121,15 @@ export class DashboardComponent implements OnInit {
       }
     });
   }
+
   private adicionarLogLocal(protocolo: Protocolo) {
     const novoLog: LogAtividade = {
       id: Date.now(),
-      protocolo: protocolo,
-      dataHora: new Date().toISOString(),
+      nomeMissao: protocolo.nome,
+      icone: protocolo.icone,
       xpGanho: 0,
-      goldGanho: 0
+      duracaoMinutos: protocolo.duracaoMinutos || 15,
+      dataHora: new Date().toISOString()
     };
     
     this.historico = [novoLog, ...this.historico];

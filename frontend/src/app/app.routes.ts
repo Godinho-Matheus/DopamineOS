@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { HistoryComponent } from './components/history/history';
 
 export const routes: Routes = [
     {
@@ -28,5 +29,11 @@ export const routes: Routes = [
     {
     path: '**',
     redirectTo: 'dashboard'
-    }
+    },
+
+    {
+    path: 'history',
+    loadComponent: () => import('./components/history/history').then(m => m.HistoryComponent),
+    title: 'DopamineOS - Histórico'
+}
 ];

@@ -2,7 +2,7 @@ package com.dopamineos.backend.entity.enums;
 
 import lombok.Getter;
 
-@Getter // Lombok evita boilerplate de getters manuais
+@Getter
 public enum Dificuldade {
     EASY(10, 2, 1),
     MEDIUM(30, 5, 2),
@@ -11,7 +11,7 @@ public enum Dificuldade {
 
     private final int xpBase;
     private final int goldBase;
-    private final int pontosAtributo; // Novo campo!
+    private final int pontosAtributo;
 
     Dificuldade(int xpBase, int goldBase, int pontosAtributo) {
         this.xpBase = xpBase;

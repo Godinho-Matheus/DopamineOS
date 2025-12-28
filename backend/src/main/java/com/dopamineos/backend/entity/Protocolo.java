@@ -3,17 +3,13 @@ package com.dopamineos.backend.entity;
 import com.dopamineos.backend.entity.enums.Atributo;
 import com.dopamineos.backend.entity.enums.Dificuldade;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "tb_protocolos")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "tb_protocolos")
 public class Protocolo {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,14 +17,16 @@ public class Protocolo {
     private String nome;
     private String icone;
     private String cor;
-
-    private int duracaoMinutos;
+    
+    private String descricao;
 
     @Enumerated(EnumType.STRING)
     private Atributo atributo;
 
     @Enumerated(EnumType.STRING)
     private Dificuldade dificuldade;
+    
+    private int duracaoMinutos;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")

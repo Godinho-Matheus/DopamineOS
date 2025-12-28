@@ -13,6 +13,7 @@ public record ProtocoloDTO(
     
     String icone,
     String cor,
+    
     String descricao,
     
     @NotNull(message = "A duração é obrigatória")

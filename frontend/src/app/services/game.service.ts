@@ -28,10 +28,11 @@ export enum ClasseRPG {
 
 export interface LogAtividade {
   id: number;
-  protocolo: Protocolo;
-  dataHora: string;
+  nomeMissao: string;
+  icone: string;
   xpGanho: number;
-  goldGanho: number;
+  duracaoMinutos: number;
+  dataHora: string;
 }
 
 export interface Protocolo {
@@ -45,6 +46,7 @@ export interface Protocolo {
   duracaoMinutos: number;
 }
 
+
 export interface Usuario {
   id: number;
   nome: string;
@@ -53,7 +55,7 @@ export interface Usuario {
   xpAtual: number;
   xpParaProximoNivel: number;
   moedas: number;
-  
+
   // Atributos
   forca: number;
   destreza: number;
@@ -68,7 +70,6 @@ export interface Usuario {
   maxMp: number;
 }
 
-// Interface para ler o erro personalizado do Java
 export interface StandardError {
   timestamp: string;
   status: number;
@@ -84,6 +85,7 @@ export interface StandardError {
 })
 export class GameService {
   private apiUrl = 'http://localhost:8080/api/v1/game';
+  
   constructor(private http: HttpClient) { }
 
   // 1. Pegar Perfil
@@ -96,33 +98,29 @@ export class GameService {
     return this.http.get<Protocolo[]>(`${this.apiUrl}/protocolos`);
   }
 
-  // 3. Criar Missão
+  // 3. Criar Missão Única
   criarProtocolo(protocolo: Protocolo): Observable<Protocolo> {
-    return this.http.post<Protocolo>(`${this.apiUrl}/protocolos`, protocolo);
+    return this.http.post<Protocolo>(`${this.apiUrl}/protocolo`, protocolo);
   }
 
-  // 4. Fazer Check-in
+  // 4. Salvar Várias Missões
+  salvarMissoes(protocolos: Protocolo[]): Observable<Protocolo[]> {
+    return this.http.post<Protocolo[]>(`${this.apiUrl}/protocolos`, protocolos);
+  }
+
+  // 5. Fazer Check-in
   fazerCheckin(protocoloId: number): Observable<Usuario> {
     return this.http.post<Usuario>(`${this.apiUrl}/checkin/${protocoloId}`, {});
   }
 
-  // 5. Setup Inicial
+  // 6. Setup Inicial
   setup(nome: string, classe: ClasseRPG): Observable<Usuario> {
     const payload = { nome, classe };
     return this.http.post<Usuario>(`${this.apiUrl}/setup`, payload);
   }
-
-  /*
-  usarCura(): Observable<Usuario> {
-    return this.http.post<Usuario>(`${this.apiUrl}/habilidade/curar`, {});
+  
+  // 7. Histórico Geral
+  getHistoricoGeral(): Observable<LogAtividade[]> {
+    return this.http.get<LogAtividade[]>(`${this.apiUrl}/historico`);
   }
-
-  sofrerDano(qtd: number): Observable<Usuario> {
-    return this.http.post<Usuario>(`${this.apiUrl}/dano/${qtd}`, {});
-  }
-
-  getHistorico(data: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/historico?data=${data}`);
-  }
-  */
 }
