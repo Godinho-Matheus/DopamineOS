@@ -22,7 +22,7 @@ public class Protocolo {
     private String icone;
     private String cor;
 
-    private int duracaoMinutos = 30;
+    private int duracaoMinutos;
 
     @Enumerated(EnumType.STRING)
     private Atributo atributo;
