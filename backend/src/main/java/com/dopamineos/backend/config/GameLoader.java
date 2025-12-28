@@ -1,66 +1,87 @@
 package com.dopamineos.backend.config;
 
-import com.dopamineos.backend.entity.*;
-import com.dopamineos.backend.entity.enums.*;
-import com.dopamineos.backend.repository.*;
+import com.dopamineos.backend.entity.Protocolo;
+import com.dopamineos.backend.entity.Usuario;
+import com.dopamineos.backend.entity.enums.Atributo;
+import com.dopamineos.backend.entity.enums.ClasseRPG;
+import com.dopamineos.backend.entity.enums.Dificuldade;
+import com.dopamineos.backend.repository.ProtocoloRepository;
+import com.dopamineos.backend.repository.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 @Configuration
-public class GameLoader {
+@RequiredArgsConstructor
+@Slf4j
+public class GameLoader implements CommandLineRunner {
 
-    @Bean
-    CommandLineRunner initGame(UsuarioRepository userRepo, ProtocoloRepository protoRepo) {
-        return args -> {
-            // 1. Cria o Player se não existir
-            if (userRepo.count() == 0) {
-                Usuario u = new Usuario();
-                u.setNome("Alex, o Paladino");
-                u.setClasse(ClasseRPG.GUERREIRO);
-                u.setNivel(1);
-                u.setXpAtual(0);
-                u.setMoedas(0);
-                // Stats iniciais
-                u.setForca(10);
-                u.setDestreza(5);
-                u.setIntelecto(10);
-                u.setCarisma(5);
-                u.setConstituicao(10);
-                userRepo.save(u);
-                System.out.println("🎮 Player criado!");
+    private final UsuarioRepository usuarioRepository;
+    private final ProtocoloRepository protocoloRepository;
 
-                // 2. Cria os Botões de Rotina
-                criarProtocolo(protoRepo, "⚔️ Preparar Batalha", "🧴", Atributo.CONSTITUICAO, Dificuldade.EASY);
-                criarProtocolo(protoRepo, "🏋️ Templo de Ferro", "💪", Atributo.FORCA, Dificuldade.HARD);
-                criarProtocolo(protoRepo, "🧠 Deep Work", "💻", Atributo.INTELECTO, Dificuldade.EPIC);
-                criarProtocolo(protoRepo, "🍖 Banquete (Almoço)", "🍗", Atributo.CONSTITUICAO, Dificuldade.MEDIUM);
-                criarProtocolo(protoRepo, "🚴 Cardio + Anime", "🚲", Atributo.DESTREZA, Dificuldade.MEDIUM);
-                criarProtocolo(protoRepo, "📚 Grimoire (Estudo)", "📖", Atributo.INTELECTO, Dificuldade.HARD);
-                criarProtocolo(protoRepo, "🛌 Long Rest", "💤", Atributo.CONSTITUICAO, Dificuldade.EASY);
-
-                System.out.println("🃏 Deck de Rotina criado!");
-            }
-            // Se não houver protocolos (por exemplo: foram apagados em setup), garante seeds
-            if (protoRepo.count() == 0) {
-                criarProtocolo(protoRepo, "⚔️ Preparar Batalha", "🧴", Atributo.CONSTITUICAO, Dificuldade.EASY);
-                criarProtocolo(protoRepo, "🏋️ Templo de Ferro", "💪", Atributo.FORCA, Dificuldade.HARD);
-                criarProtocolo(protoRepo, "🧠 Deep Work", "💻", Atributo.INTELECTO, Dificuldade.EPIC);
-                criarProtocolo(protoRepo, "🍖 Banquete (Almoço)", "🍗", Atributo.CONSTITUICAO, Dificuldade.MEDIUM);
-                criarProtocolo(protoRepo, "🚴 Cardio + Anime", "🚲", Atributo.DESTREZA, Dificuldade.MEDIUM);
-                criarProtocolo(protoRepo, "📚 Grimoire (Estudo)", "📖", Atributo.INTELECTO, Dificuldade.HARD);
-                criarProtocolo(protoRepo, "🛌 Long Rest", "💤", Atributo.CONSTITUICAO, Dificuldade.EASY);
-                System.out.println("🃏 Deck de Rotina criado (verificação adicional)!");
-            }
-        };
+    @Override
+    public void run(String... args) throws Exception {
+        verificarECriarJogador();
+        verificarECriarMissoes();
     }
 
-    private void criarProtocolo(ProtocoloRepository repo, String nome, String icone, Atributo atr, Dificuldade dif) {
+    private void verificarECriarJogador() {
+        if (usuarioRepository.count() > 0) {
+            return;
+        }
+
+        log.info("🎮 Criando Player 'Alex, o Paladino'...");
+
+        Usuario u = new Usuario();
+        
+        u.resetarPersonagem("Alex, o Paladino", ClasseRPG.GUERREIRO);
+        
+        u.setForca(10);
+        u.setDestreza(5);
+        u.setIntelecto(10);
+        u.setCarisma(5);
+        u.setConstituicao(10);
+        u.setMaxHp(u.getConstituicao() * 10);
+        u.setHpAtual(u.getMaxHp());
+        u.setMaxMp(u.getIntelecto() * 10);
+        u.setMpAtual(u.getMaxMp());
+
+        usuarioRepository.save(u);
+        log.info("✅ Player criado com sucesso!");
+    }
+
+    private void verificarECriarMissoes() {
+        if (protocoloRepository.count() > 0) {
+            return;
+        }
+
+        log.info("🃏 Criando Deck de Rotina...");
+
+        List<Protocolo> seeds = List.of(
+            criar("⚔️ Preparar Batalha", "🧴", Atributo.CONSTITUICAO, Dificuldade.EASY, 10),
+            criar("🏋️ Templo de Ferro", "💪", Atributo.FORCA, Dificuldade.HARD, 60),
+            criar("🧠 Deep Work", "💻", Atributo.INTELECTO, Dificuldade.EPIC, 90),
+            criar("🍖 Banquete (Almoço)", "🍗", Atributo.CONSTITUICAO, Dificuldade.MEDIUM, 30),
+            criar("🚴 Cardio + Anime", "🚲", Atributo.DESTREZA, Dificuldade.MEDIUM, 45),
+            criar("📚 Grimoire (Estudo)", "📖", Atributo.INTELECTO, Dificuldade.HARD, 60),
+            criar("🛌 Long Rest", "💤", Atributo.CONSTITUICAO, Dificuldade.EASY, 480)
+        );
+
+        protocoloRepository.saveAll(seeds);
+        log.info("✅ {} cartas de missão adicionadas ao Grimório!", seeds.size());
+    }
+
+    private Protocolo criar(String nome, String icone, Atributo atr, Dificuldade dif, int minutos) {
         Protocolo p = new Protocolo();
         p.setNome(nome);
         p.setIcone(icone);
         p.setAtributo(atr);
         p.setDificuldade(dif);
-        repo.save(p);
+        p.setDuracaoMinutos(minutos);
+        // p.setDescricao("Hábito da Rotina"); 
+        return p;
     }
 }

@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { GameService, Usuario, Protocolo } from '../../services/game.service';
 import { NgApexchartsModule, ChartComponent, ApexAxisChartSeries, ApexChart, ApexXAxis, ApexStroke, ApexFill, ApexMarkers, ApexYAxis, ApexTheme } from "ng-apexcharts";
 import { SidebarComponent } from '../sidebar/sidebar';
+
+import { GameService, Usuario, Protocolo, LogAtividade } from '../../services/game.service';
 
 export type ChartOptions = {
   series: ApexAxisChartSeries;
@@ -24,19 +25,30 @@ export type ChartOptions = {
   styleUrl: './dashboard.css'
 })
 export class DashboardComponent implements OnInit {
+  
   @ViewChild("chart") chart: ChartComponent | undefined;
   public chartOptions: Partial<ChartOptions> | any;
   
   usuario?: Usuario;
   protocolos: Protocolo[] = [];
+  historico: LogAtividade[] = [];
+  
   viewMode: 'rotina' | 'status' = 'rotina';
-
-  historico: any[] = [];
   dataSelecionada: string = '';
   totalMinutosHoje: number = 0;
+  loadingCheckin = false;
 
   constructor(private gameService: GameService) {
-    this.dataSelecionada = this.getDataHojeLocal();
+    this.dataSelecionada = new Date().toISOString().split('T')[0]; // Pega YYYY-MM-DD
+    this.inicializarGrafico();
+  }
+
+  ngOnInit(): void {
+    this.carregarDadosIniciais();
+  }
+
+  // Inicialização limpa do gráfico
+  private inicializarGrafico() {
     this.chartOptions = {
       series: [{ name: 'Seus Atributos', data: [0, 0, 0, 0, 0] }],
       chart: { height: 350, type: 'radar', toolbar: { show: false }, background: 'transparent' },
@@ -47,119 +59,93 @@ export class DashboardComponent implements OnInit {
       stroke: { width: 2, colors: ['#3b82f6'] },
       fill: { opacity: 0.2, colors: ['#3b82f6'] },
       markers: { size: 4, colors: ['#3b82f6'] },
-      yaxis: { show: false, min: 0 },
+      yaxis: { show: false, min: 0, max: 20 },
       theme: { mode: 'dark' }
     };
   }
 
-  private getDataHojeLocal(): string {
-    const hoje = new Date();
-    const ano = hoje.getFullYear();
-    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-    const dia = String(hoje.getDate()).padStart(2, '0');
-    return `${ano}-${mes}-${dia}`;
-  }
-
-  ngOnInit(): void {
-    this.carregarDados();
-    this.carregarHistorico();
-  }
-
-  carregarDados() {
+  carregarDadosIniciais() {
+    // 1. Carrega Perfil
     this.gameService.getPerfil().subscribe({
       next: (dados) => {
         this.usuario = dados;
         this.atualizarGrafico(dados);
       },
-      error: (err) => console.error(err)
+      error: (err) => console.error('Erro ao carregar perfil', err)
     });
 
-    this.gameService.getProtocolos().subscribe(dados => {
-      this.protocolos = dados;
+    // 2. Carrega Missões Disponíveis
+    this.gameService.getProtocolos().subscribe({
+      next: (dados) => this.protocolos = dados,
+      error: (err) => console.error('Erro ao carregar protocolos', err)
     });
+
+    // 3. Carrega Histórico do Dia (implementar no backend)
+    // this.carregarHistorico();
   }
 
   carregarHistorico() {
+    // Exemplo de implementação futura:
+    /*
     this.gameService.getHistorico(this.dataSelecionada).subscribe(logs => {
       this.historico = logs;
       this.recalcularMinutos();
     });
+    */
   }
 
-  recalcularMinutos() {
-    this.totalMinutosHoje = this.historico.reduce((acc, log) => acc + (log.protocolo.duracaoMinutos || 15), 0);
-  }
-  
-  aoMudarData(event: any) {
-    this.dataSelecionada = event.target.value;
-    this.carregarHistorico();
-  }
-  
   atualizarGrafico(u: Usuario) {
     this.chartOptions.series = [{
-      name: 'Nível',
+      name: 'Nível Atual',
       data: [u.forca, u.destreza, u.intelecto, u.carisma, u.constituicao]
     }];
+    const maiorAtributo = Math.max(u.forca, u.destreza, u.intelecto, u.carisma, u.constituicao);
+    this.chartOptions.yaxis = { show: false, min: 0, max: maiorAtributo + 5 };
   }
 
   executar(protocolo: Protocolo) {
-    
-    // 1. UI
-    const novoLog = {
-      id: Date.now(),
-      protocolo: protocolo,
-      dataHora: new Date().toISOString(),
-      xpGanho: this.estimarXp(protocolo.dificuldade),
-      goldGanho: this.estimarGold(protocolo.dificuldade)
-    };
-
-    this.historico = [novoLog, ...this.historico]; 
-    this.recalcularMinutos();
-
-    // 2. Chamada ao backend
+    if (!protocolo.id || this.loadingCheckin) return;
+    this.loadingCheckin = true;
     this.gameService.fazerCheckin(protocolo.id).subscribe({
-      next: (u) => {
-        this.usuario = u;
-        this.atualizarGrafico(u);
+      next: (usuarioAtualizado) => {
+        this.usuario = usuarioAtualizado;
+        this.atualizarGrafico(usuarioAtualizado);
+        this.adicionarLogLocal(protocolo);
+        this.loadingCheckin = false;
+        console.log(`Checkin realizado! XP Total: ${usuarioAtualizado.xpAtual}`);
       },
       error: (err) => {
-        console.error('Erro ao completar missão:', err);
+        this.loadingCheckin = false;
+        console.error('Falha no checkin:', err);
+        alert('Erro ao completar missão: ' + (err.error?.message || 'Erro de conexão'));
       }
     });
   }
-    // 3. Funções para estimar recompensas (temporárias)
-  estimarXp(dificuldade: string): number {
-    switch(dificuldade) {
-      case 'EASY': return 15;
-      case 'MEDIUM': return 30;
-      case 'HARD': return 50;
-      case 'EPIC': return 100;
-      default: return 10;
-    }
+  private adicionarLogLocal(protocolo: Protocolo) {
+    const novoLog: LogAtividade = {
+      id: Date.now(),
+      protocolo: protocolo,
+      dataHora: new Date().toISOString(),
+      xpGanho: 0,
+      goldGanho: 0
+    };
+    
+    this.historico = [novoLog, ...this.historico];
+    this.totalMinutosHoje += (protocolo.duracaoMinutos || 15);
   }
 
-  estimarGold(dificuldade: string): number {
-    switch(dificuldade) {
-      case 'EASY': return 5;
-      case 'MEDIUM': return 10;
-      case 'HARD': return 20;
-      case 'EPIC': return 50;
-      default: return 5;
-    }
+  get porcentagemXP(): number {
+    if (!this.usuario) return 0;
+    return Math.min((this.usuario.xpAtual / this.usuario.xpParaProximoNivel) * 100, 100);
   }
 
-  curar() {
-    if (this.usuario && this.usuario.mpAtual < 20) {
-      alert('Mana insuficiente!');
-      return;
-    }
-    this.gameService.usarCura().subscribe(u => { this.usuario = u; });
+  get porcentagemHP(): number {
+    if (!this.usuario) return 0;
+    return (this.usuario.hpAtual / this.usuario.maxHp) * 100;
   }
-
-  tomarDano() {
-    this.gameService.sofrerDano(10).subscribe(u => {
-      this.usuario = u;
-      if (u.hpAtual === 0) alert('💀 VOCÊ MORREU!');
-    });
+  
+  get porcentagemMP(): number {
+    if (!this.usuario) return 0;
+    return (this.usuario.mpAtual / this.usuario.maxMp) * 100;
   }
 }

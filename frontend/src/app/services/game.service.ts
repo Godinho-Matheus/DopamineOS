@@ -1,24 +1,54 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, catchError, throwError } from 'rxjs';
 
-//INTERFACES
+// 1. ENUMS
+export enum Atributo {
+  FORCA = 'FORCA',
+  DESTREZA = 'DESTREZA',
+  INTELECTO = 'INTELECTO',
+  CARISMA = 'CARISMA',
+  CONSTITUICAO = 'CONSTITUICAO'
+}
+
+export enum Dificuldade {
+  EASY = 'EASY',
+  MEDIUM = 'MEDIUM',
+  HARD = 'HARD',
+  EPIC = 'EPIC'
+}
+
+export enum ClasseRPG {
+  GUERREIRO = 'GUERREIRO',
+  MAGO = 'MAGO',
+  LADINO = 'LADINO'
+}
+
+// 2. INTERFACES
+
+export interface LogAtividade {
+  id: number;
+  protocolo: Protocolo;
+  dataHora: string;
+  xpGanho: number;
+  goldGanho: number;
+}
 
 export interface Protocolo {
-  id: number;
+  id?: number;
   nome: string;
   icone: string;
   cor?: string;
   descricao?: string;
-  atributo: 'FORCA' | 'DESTREZA' | 'INTELECTO' | 'CARISMA' | 'CONSTITUICAO';
-  dificuldade: 'EASY' | 'MEDIUM' | 'HARD' | 'EPIC';
+  atributo: Atributo;
+  dificuldade: Dificuldade;
   duracaoMinutos: number;
 }
 
 export interface Usuario {
   id: number;
   nome: string;
-  classe: string;
+  classe: ClasseRPG;
   nivel: number;
   xpAtual: number;
   xpParaProximoNivel: number;
@@ -38,16 +68,22 @@ export interface Usuario {
   maxMp: number;
 }
 
-// SERVIÇO
+// Interface para ler o erro personalizado do Java
+export interface StandardError {
+  timestamp: string;
+  status: number;
+  error: string;
+  message: string;
+  path: string;
+}
+
+// 3. O SERVIÇO
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameService {
-
-  // URL da API
-  private apiUrl = 'http://localhost:8080/game';
-
+  private apiUrl = 'http://localhost:8080/api/v1/game';
   constructor(private http: HttpClient) { }
 
   // 1. Pegar Perfil
@@ -65,17 +101,18 @@ export class GameService {
     return this.http.post<Protocolo>(`${this.apiUrl}/protocolos`, protocolo);
   }
 
-  // 4. Fazer Check-in (Ganhar XP)
+  // 4. Fazer Check-in
   fazerCheckin(protocoloId: number): Observable<Usuario> {
     return this.http.post<Usuario>(`${this.apiUrl}/checkin/${protocoloId}`, {});
   }
 
-  // 5. Configurar Personagem (Setup)
-  setup(dados: { nome: string; classe: string }): Observable<Usuario> {
-    return this.http.post<Usuario>(`${this.apiUrl}/setup`, dados);
+  // 5. Setup Inicial
+  setup(nome: string, classe: ClasseRPG): Observable<Usuario> {
+    const payload = { nome, classe };
+    return this.http.post<Usuario>(`${this.apiUrl}/setup`, payload);
   }
 
-  // 6. Ações de Jogo
+  /*
   usarCura(): Observable<Usuario> {
     return this.http.post<Usuario>(`${this.apiUrl}/habilidade/curar`, {});
   }
@@ -84,8 +121,8 @@ export class GameService {
     return this.http.post<Usuario>(`${this.apiUrl}/dano/${qtd}`, {});
   }
 
-  // 7. Histórico
   getHistorico(data: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/historico?data=${data}`);
   }
+  */
 }

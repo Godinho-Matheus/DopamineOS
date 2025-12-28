@@ -29,7 +29,7 @@
         <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 flex flex-col gap-6 shadow-xl">
           
           <div class="flex gap-4">
-            <div class="w-16">
+            <div class="w-20">
               <label class="block text-xs text-gray-500 mb-1 font-bold">ÍCONE</label>
               <input [(ngModel)]="novaMissao.icone" class="w-full bg-gray-950 border-2 border-gray-800 focus:border-blue-500 rounded-xl text-center text-2xl py-2 transition-colors outline-none" placeholder="⚔️">
             </div>
@@ -40,27 +40,86 @@
           </div>
 
           <div>
+             <label class="block text-xs text-gray-500 mb-2 font-bold flex justify-between">
+                <span>DURAÇÃO ESTIMADA</span>
+                <span class="text-blue-400">{{ novaMissao.duracaoMinutos }} min</span>
+             </label>
+             <input type="range" [(ngModel)]="novaMissao.duracaoMinutos" min="5" max="180" step="5" 
+                    class="w-full h-2 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-600">
+             <div class="flex justify-between text-xs text-gray-600 mt-1">
+                <span>Rápido (5m)</span>
+                <span>Épico (3h)</span>
+             </div>
+          </div>
+
+          <div>
             <label class="block text-xs text-gray-500 mb-2 font-bold">RECOMPENSA DE ATRIBUTO</label>
             <div class="grid grid-cols-3 md:grid-cols-5 gap-2">
-              <button (click)="novaMissao.atributo = 'FORCA'" [class.ring-2]="novaMissao.atributo === 'FORCA'" class="p-2 rounded-lg bg-orange-900/20 border border-orange-500/30 text-orange-400 hover:bg-orange-900/40 transition-all text-xs font-bold ring-orange-500">💪 FOR</button>
-              <button (click)="novaMissao.atributo = 'DESTREZA'" [class.ring-2]="novaMissao.atributo === 'DESTREZA'" class="p-2 rounded-lg bg-green-900/20 border border-green-500/30 text-green-400 hover:bg-green-900/40 transition-all text-xs font-bold ring-green-500">🏃 DES</button>
-              <button (click)="novaMissao.atributo = 'INTELECTO'" [class.ring-2]="novaMissao.atributo === 'INTELECTO'" class="p-2 rounded-lg bg-blue-900/20 border border-blue-500/30 text-blue-400 hover:bg-blue-900/40 transition-all text-xs font-bold ring-blue-500">🧠 INT</button>
-              <button (click)="novaMissao.atributo = 'CARISMA'" [class.ring-2]="novaMissao.atributo === 'CARISMA'" class="p-2 rounded-lg bg-purple-900/20 border border-purple-500/30 text-purple-400 hover:bg-purple-900/40 transition-all text-xs font-bold ring-purple-500">🗣️ CAR</button>
-              <button (click)="novaMissao.atributo = 'CONSTITUICAO'" [class.ring-2]="novaMissao.atributo === 'CONSTITUICAO'" class="p-2 rounded-lg bg-red-900/20 border border-red-500/30 text-red-400 hover:bg-red-900/40 transition-all text-xs font-bold ring-red-500">❤️ CON</button>
+              
+              <button (click)="novaMissao.atributo = EAtributo.FORCA" 
+                      [class.ring-2]="novaMissao.atributo === EAtributo.FORCA" 
+                      class="p-2 rounded-lg bg-orange-900/20 border border-orange-500/30 text-orange-400 hover:bg-orange-900/40 transition-all text-xs font-bold ring-orange-500">
+                 💪 FOR
+              </button>
+              
+              <button (click)="novaMissao.atributo = EAtributo.DESTREZA" 
+                      [class.ring-2]="novaMissao.atributo === EAtributo.DESTREZA" 
+                      class="p-2 rounded-lg bg-green-900/20 border border-green-500/30 text-green-400 hover:bg-green-900/40 transition-all text-xs font-bold ring-green-500">
+                 🏃 DES
+              </button>
+              
+              <button (click)="novaMissao.atributo = EAtributo.INTELECTO" 
+                      [class.ring-2]="novaMissao.atributo === EAtributo.INTELECTO" 
+                      class="p-2 rounded-lg bg-blue-900/20 border border-blue-500/30 text-blue-400 hover:bg-blue-900/40 transition-all text-xs font-bold ring-blue-500">
+                 🧠 INT
+              </button>
+              
+              <button (click)="novaMissao.atributo = EAtributo.CARISMA" 
+                      [class.ring-2]="novaMissao.atributo === EAtributo.CARISMA" 
+                      class="p-2 rounded-lg bg-purple-900/20 border border-purple-500/30 text-purple-400 hover:bg-purple-900/40 transition-all text-xs font-bold ring-purple-500">
+                 🗣️ CAR
+              </button>
+              
+              <button (click)="novaMissao.atributo = EAtributo.CONSTITUICAO" 
+                      [class.ring-2]="novaMissao.atributo === EAtributo.CONSTITUICAO" 
+                      class="p-2 rounded-lg bg-red-900/20 border border-red-500/30 text-red-400 hover:bg-red-900/40 transition-all text-xs font-bold ring-red-500">
+                 ❤️ CON
+              </button>
             </div>
           </div>
 
           <div>
             <label class="block text-xs text-gray-500 mb-2 font-bold">DIFICULDADE (XP & GOLD)</label>
             <div class="grid grid-cols-4 gap-2">
-              <button (click)="novaMissao.dificuldade = 'EASY'" [class.ring-2]="novaMissao.dificuldade === 'EASY'" class="p-2 rounded-lg bg-gray-800 border border-gray-600 hover:bg-gray-700 ring-green-400 text-xs font-bold">🟢 Easy</button>
-              <button (click)="novaMissao.dificuldade = 'MEDIUM'" [class.ring-2]="novaMissao.dificuldade === 'MEDIUM'" class="p-2 rounded-lg bg-gray-800 border border-gray-600 hover:bg-gray-700 ring-yellow-400 text-xs font-bold">🟡 Medium</button>
-              <button (click)="novaMissao.dificuldade = 'HARD'" [class.ring-2]="novaMissao.dificuldade === 'HARD'" class="p-2 rounded-lg bg-gray-800 border border-gray-600 hover:bg-gray-700 ring-red-400 text-xs font-bold">🔴 Hard</button>
-              <button (click)="novaMissao.dificuldade = 'EPIC'" [class.ring-2]="novaMissao.dificuldade === 'EPIC'" class="p-2 rounded-lg bg-purple-900/20 border border-purple-500/50 text-purple-300 hover:bg-purple-900/40 ring-purple-500 text-xs font-bold">🟣 EPIC</button>
+              
+              <button (click)="novaMissao.dificuldade = EDificuldade.EASY" 
+                      [class.ring-2]="novaMissao.dificuldade === EDificuldade.EASY" 
+                      class="p-2 rounded-lg bg-gray-800 border border-gray-600 hover:bg-gray-700 ring-green-400 text-xs font-bold">
+                 🟢 Easy
+              </button>
+              
+              <button (click)="novaMissao.dificuldade = EDificuldade.MEDIUM" 
+                      [class.ring-2]="novaMissao.dificuldade === EDificuldade.MEDIUM" 
+                      class="p-2 rounded-lg bg-gray-800 border border-gray-600 hover:bg-gray-700 ring-yellow-400 text-xs font-bold">
+                 🟡 Medium
+              </button>
+              
+              <button (click)="novaMissao.dificuldade = EDificuldade.HARD" 
+                      [class.ring-2]="novaMissao.dificuldade === EDificuldade.HARD" 
+                      class="p-2 rounded-lg bg-gray-800 border border-gray-600 hover:bg-gray-700 ring-red-400 text-xs font-bold">
+                 🔴 Hard
+              </button>
+              
+              <button (click)="novaMissao.dificuldade = EDificuldade.EPIC" 
+                      [class.ring-2]="novaMissao.dificuldade === EDificuldade.EPIC" 
+                      class="p-2 rounded-lg bg-purple-900/20 border border-purple-500/50 text-purple-300 hover:bg-purple-900/40 ring-purple-500 text-xs font-bold">
+                 🟣 EPIC
+              </button>
             </div>
           </div>
 
-          <button (click)="salvar()" class="mt-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20 transition-all active:scale-95 flex items-center justify-center gap-2">
+          <button (click)="salvar()" [disabled]="!novaMissao.nome"
+                  class="mt-2 w-full bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20 transition-all active:scale-95 flex items-center justify-center gap-2">
             <span>✨</span> Criar Contrato
           </button>
 
@@ -69,22 +128,25 @@
 
       <div class="lg:col-span-5 flex flex-col gap-6">
         
-        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 opacity-80 pointer-events-none select-none">
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 opacity-90 select-none">
           <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 text-center">Preview da Carta</h3>
           
-          <div class="bg-gray-950 border border-gray-700 p-4 rounded-xl flex items-center gap-4 shadow-2xl relative overflow-hidden">
+          <div class="bg-gray-950 border border-gray-700 p-4 rounded-xl flex items-center gap-4 shadow-2xl relative overflow-hidden transition-all hover:border-gray-500">
              <div class="w-14 h-14 bg-gray-800 rounded-lg flex items-center justify-center text-3xl shadow-inner">
                {{ novaMissao.icone || '?' }}
              </div>
              
              <div class="flex-1 z-10">
-               <h3 class="font-bold text-white text-lg">{{ novaMissao.nome || 'Nome da Missão' }}</h3>
+               <h3 class="font-bold text-white text-lg truncate">{{ novaMissao.nome || 'Nome da Missão' }}</h3>
                <div class="flex gap-2 text-xs mt-1">
                  <span [class]="'px-2 py-0.5 rounded font-mono border ' + getCorAtributo(novaMissao.atributo)">
                    {{ novaMissao.atributo }}
                  </span>
                  <span class="px-2 py-0.5 rounded bg-gray-800 text-gray-400 font-bold border border-gray-700">
                    {{ novaMissao.dificuldade }}
+                 </span>
+                 <span class="px-2 py-0.5 rounded bg-gray-800 text-blue-400 font-bold border border-gray-700">
+                    ⏱️ {{ novaMissao.duracaoMinutos }}m
                  </span>
                </div>
              </div>
@@ -94,21 +156,32 @@
         </div>
 
         <div class="flex-1 bg-gray-900/30 rounded-2xl border border-dashed border-gray-800 p-4 overflow-y-auto max-h-[500px]">
-          <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Missões Ativas ({{ protocolos.length }})</h3>
+          <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 flex justify-between">
+              <span>Missões Ativas</span>
+              <span class="bg-gray-800 px-2 rounded text-white">{{ protocolos.length }}</span>
+          </h3>
           
           <div class="flex flex-col gap-2">
             <div *ngFor="let p of protocolos" class="group flex items-center justify-between p-3 rounded-lg bg-gray-900 border border-gray-800 hover:border-gray-600 transition-colors">
               <div class="flex items-center gap-3">
-                <span class="text-xl">{{ p.icone }}</span>
-                <span class="text-sm text-gray-300 font-medium">{{ p.nome }}</span>
+                <span class="text-xl w-8 text-center">{{ p.icone }}</span>
+                <div>
+                    <div class="text-sm text-gray-200 font-medium">{{ p.nome }}</div>
+                    <div class="text-[10px] text-gray-500 flex gap-2">
+                        <span [class]="getCorAtributo(p.atributo).split(' ')[0]">{{ p.atributo }}</span>
+                        <span>•</span>
+                        <span>{{ p.dificuldade }}</span>
+                    </div>
+                </div>
               </div>
-              <button (click)="deletar(p.id)" class="text-gray-600 hover:text-red-500 p-2 opacity-0 group-hover:opacity-100 transition-all" title="Excluir">
+              <button (click)="deletar(p.id)" class="text-gray-600 hover:text-red-500 hover:bg-red-500/10 p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all" title="Excluir">
                 🗑️
               </button>
             </div>
             
-            <div *ngIf="protocolos.length === 0" class="text-center py-10 text-gray-600 text-sm">
-              Nenhuma missão criada ainda.
+            <div *ngIf="protocolos.length === 0" class="text-center py-10 text-gray-600 text-sm flex flex-col items-center gap-2">
+              <span class="text-2xl">💤</span>
+              <span>O grimório está vazio.</span>
             </div>
           </div>
 

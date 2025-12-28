@@ -2,77 +2,128 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { GameService } from '../../services/game.service';
+import { forkJoin, of } from 'rxjs';
+import { switchMap, tap, catchError } from 'rxjs/operators';
+
+import { GameService, ClasseRPG, Atributo, Dificuldade, Protocolo } from '../../services/game.service';
+
+interface TarefaSelecionavel extends Protocolo {
+  selecionada: boolean;
+}
 
 @Component({
   selector: 'app-setup',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './setup.html'
+  templateUrl: './setup.html',
+  styleUrls: ['./setup.css']
 })
 export class SetupComponent {
 
-  step = 1; // Para controlar os passos (1: Nome, 2: Classe, 3: Tarefas)
+  step = 1;
   nome: string = '';
-  classeSelecionada: string = '';
+  loading = false;
   
-  // Lista de Missões Selecionadas pelo usuário
-  selecionadas: any[] = [];
+  EClasse = ClasseRPG;
 
-  // Dados das Classes
+  classeSelecionada: ClasseRPG | null = null;
+
+  // Dados estáticos visuais
   classes = [
-    { id: 'GUERREIRO', nome: 'Guerreiro', icone: '⚔️', desc: 'Foco em Força e Constituição.', cor: 'border-orange-500 text-orange-500 bg-orange-900/20' },
-    { id: 'MAGO', nome: 'Mago', icone: '🔮', desc: 'Foco em Intelecto e Mana.', cor: 'border-blue-500 text-blue-500 bg-blue-900/20' },
-    { id: 'LADINO', nome: 'Ladino', icone: '🗡️', desc: 'Foco em Destreza e Carisma.', cor: 'border-green-500 text-green-500 bg-green-900/20' }
+    {
+      id: ClasseRPG.GUERREIRO,
+      nome: 'Guerreiro',
+      icone: '⚔️',
+      desc: 'Mestre da Força e Constituição.',
+      cor: 'border-orange-500 text-orange-500 bg-orange-900/20'
+    },
+    {
+      id: ClasseRPG.MAGO,
+      nome: 'Mago',
+      icone: '🔮',
+      desc: 'Sábio do Intelecto e Mana.',
+      cor: 'border-blue-500 text-blue-500 bg-blue-900/20'
+    },
+    {
+      id: ClasseRPG.LADINO,
+      nome: 'Ladino',
+      icone: '🗡️',
+      desc: 'Ágil em Destreza e Carisma.',
+      cor: 'border-green-500 text-green-500 bg-green-900/20'
+    }
   ];
 
-  // --- O CARDÁPIO DE TAREFAS GENÉRICAS ---
-  tarefasDisponiveis = [
-    { nome: 'Beber Água (2L)', icone: '💧', atributo: 'CONSTITUICAO', dificuldade: 'EASY', duracaoMinutos: 1, selecionada: false },
-    { nome: 'Leitura Técnica', icone: '📚', atributo: 'INTELECTO', dificuldade: 'MEDIUM', duracaoMinutos: 30, selecionada: false },
-    { nome: 'Treino de Força', icone: '🏋️', atributo: 'FORCA', dificuldade: 'HARD', duracaoMinutos: 60, selecionada: false },
-    { nome: 'Cardio / Corrida', icone: '🏃', atributo: 'DESTREZA', dificuldade: 'MEDIUM', duracaoMinutos: 45, selecionada: false },
-    { nome: 'Meditação', icone: '🧘', atributo: 'INTELECTO', dificuldade: 'EASY', duracaoMinutos: 15, selecionada: false },
-    { nome: 'Networking / Social', icone: '🤝', atributo: 'CARISMA', dificuldade: 'MEDIUM', duracaoMinutos: 30, selecionada: false },
-    { nome: 'Dormir 8h', icone: '💤', atributo: 'CONSTITUICAO', dificuldade: 'HARD', duracaoMinutos: 480, selecionada: false },
-    { nome: 'Cozinhar Refeição', icone: '🍳', atributo: 'CONSTITUICAO', dificuldade: 'EASY', duracaoMinutos: 40, selecionada: false },
-    { nome: 'Estudo Profundo (Deep Work)', icone: '🧠', atributo: 'INTELECTO', dificuldade: 'HARD', duracaoMinutos: 90, selecionada: false },
-    { nome: 'Arrumar o Quarto', icone: '🧹', atributo: 'DESTREZA', dificuldade: 'EASY', duracaoMinutos: 20, selecionada: false },
+  // Lista de sugestões iniciais
+  tarefasDisponiveis: TarefaSelecionavel[] = [
+    { nome: 'Beber Água (2L)', icone: '💧', atributo: Atributo.CONSTITUICAO, dificuldade: Dificuldade.EASY, duracaoMinutos: 1, selecionada: false },
+    { nome: 'Leitura Técnica', icone: '📚', atributo: Atributo.INTELECTO, dificuldade: Dificuldade.MEDIUM, duracaoMinutos: 30, selecionada: false },
+    { nome: 'Treino de Força', icone: '🏋️', atributo: Atributo.FORCA, dificuldade: Dificuldade.HARD, duracaoMinutos: 60, selecionada: false },
+    { nome: 'Corrida', icone: '🏃', atributo: Atributo.DESTREZA, dificuldade: Dificuldade.MEDIUM, duracaoMinutos: 45, selecionada: false },
+    { nome: 'Meditação', icone: '🧘', atributo: Atributo.INTELECTO, dificuldade: Dificuldade.EASY, duracaoMinutos: 15, selecionada: false },
+    { nome: 'Networking', icone: '🤝', atributo: Atributo.CARISMA, dificuldade: Dificuldade.MEDIUM, duracaoMinutos: 30, selecionada: false },
+    { nome: 'Dormir 8h', icone: '💤', atributo: Atributo.CONSTITUICAO, dificuldade: Dificuldade.HARD, duracaoMinutos: 480, selecionada: false },
+    { nome: 'Cozinhar', icone: '🍳', atributo: Atributo.DESTREZA, dificuldade: Dificuldade.EASY, duracaoMinutos: 40, selecionada: false },
+    { nome: 'Deep Work', icone: '🧠', atributo: Atributo.INTELECTO, dificuldade: Dificuldade.HARD, duracaoMinutos: 90, selecionada: false },
+    { nome: 'Limpeza', icone: '🧹', atributo: Atributo.CONSTITUICAO, dificuldade: Dificuldade.EASY, duracaoMinutos: 20, selecionada: false },
   ];
 
   constructor(private gameService: GameService, private router: Router) {}
 
-  selecionarClasse(id: string) {
-    this.classeSelecionada = id;
-    this.step = 2; // Avança visualmente ou libera o próximo passo
+  avancarStep() {
+    if (this.step === 1 && !this.nome) return;
+    if (this.step === 2 && !this.classeSelecionada) return;
+    this.step++;
   }
 
-  toggleTarefa(tarefa: any) {
+  voltarStep() {
+    if (this.step > 1) this.step--;
+  }
+
+  selecionarClasse(classe: ClasseRPG) {
+    this.classeSelecionada = classe;
+  }
+
+  toggleTarefa(tarefa: TarefaSelecionavel) {
     tarefa.selecionada = !tarefa.selecionada;
   }
 
-  confirmar() {
+  finalizarSetup() {
     if (!this.nome || !this.classeSelecionada) return;
+    
+    this.loading = true;
 
-    // Filtra apenas as que o usuário marcou como "selecionada"
-    const tarefasFinais = this.tarefasDisponiveis
-      .filter(t => t.selecionada)
-      .map(t => ({
-        nome: t.nome,
-        icone: t.icone,
-        descricao: 'Hábito Inicial',
-        atributo: t.atributo,
-        dificuldade: t.dificuldade,
-        duracaoMinutos: t.duracaoMinutos // Envia o tempo editado pelo usuário
-      }));
+    // Cria o Personagem
+    this.gameService.setup(this.nome, this.classeSelecionada)
+      .pipe(
+        switchMap((usuarioCriado) => {
+          console.log('✅ Personagem criado:', usuarioCriado);
 
-    this.gameService.setup({ 
-      nome: this.nome, 
-      classe: this.classeSelecionada,
-      tarefasIniciais: tarefasFinais // Envia a lista para o Java
-    }).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
-      error: (err) => alert('Erro ao criar personagem.')
-    });
+          const tarefasParaSalvar = this.tarefasDisponiveis.filter(t => t.selecionada);
+
+          if (tarefasParaSalvar.length === 0) {
+            return of([]); // Nenhuma tarefa para salvar
+          }
+
+          const requisicoes = tarefasParaSalvar.map(tarefa => {
+            const { selecionada, ...protocoloLimpo } = tarefa;
+            return this.gameService.criarProtocolo(protocoloLimpo);
+          });
+
+          return forkJoin(requisicoes);
+        }),
+        tap(() => this.loading = false),
+        catchError(err => {
+          this.loading = false;
+          console.error('❌ Erro no setup:', err);
+          alert('Erro ao configurar: ' + (err.error?.message || 'Erro desconhecido'));
+          return of(null); // Retorna nulo para não quebrar a chain
+        })
+      )
+      .subscribe((resultado) => {
+        if (resultado !== null) {
+          console.log('✅ Missões criadas:', resultado);
+           this.router.navigate(['/dashboard']); // Redireciona para o jogo
+        }
+      });
   }
 }

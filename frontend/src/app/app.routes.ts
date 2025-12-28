@@ -1,11 +1,32 @@
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './components/dashboard/dashboard';
-import { SetupComponent } from './components/setup/setup'; // Importe o novo
-import { QuestEditorComponent } from './components/quest-editor/quest-editor';
 
 export const routes: Routes = [
-    { path: 'setup', component: SetupComponent },
-    { path: 'dashboard', component: DashboardComponent },
-    { path: 'editor', component: QuestEditorComponent },
-    { path: '', redirectTo: 'setup', pathMatch: 'full' }
+    {
+    path: '',
+    redirectTo: 'setup',
+    pathMatch: 'full'
+    },
+
+    {
+    path: 'setup',
+    loadComponent: () => import('./components/setup/setup').then(m => m.SetupComponent),
+    title: 'DopamineOS - Setup'
+    },
+
+    {
+    path: 'dashboard',
+    loadComponent: () => import('./components/dashboard/dashboard').then(m => m.DashboardComponent),
+    title: 'DopamineOS - Visão Geral'
+    },
+
+    {
+    path: 'game/quest-editor',
+    loadComponent: () => import('./components/quest-editor/quest-editor').then(m => m.QuestEditorComponent),
+    title: 'DopamineOS - Grimório'
+    },
+
+    {
+    path: '**',
+    redirectTo: 'dashboard'
+    }
 ];
