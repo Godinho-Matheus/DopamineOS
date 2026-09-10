@@ -63,17 +63,11 @@ Mapper (MapStruct) converte Entidade ⇄ DTO
 
 ### Backend
 - **Java 21**
-<<<<<<< HEAD
 - **Spring Boot 3.3.1** (Web, Data JPA, Validation, Actuator, DevTools)
 - **PostgreSQL** (persistência)
 - **MapStruct 1.5.5** (mapeamento entidade ⇄ DTO)
 - **Lombok** (reduz boilerplate)
 - **Maven** (build)
-=======
-- **Spring Boot 4.0.1** (Web, JPA, Validation)
-- **Banco de Dados:** PostgreSQL
-- **Maven** (Gerenciamento de dependências)
->>>>>>> ba2a2e6a7fdd81af1712754c6c820533dddf2103
 
 ### Frontend
 - **Angular 21** (componentes standalone)
