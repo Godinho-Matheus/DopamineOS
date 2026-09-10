@@ -1,0 +1,42 @@
+# ===== Dependências =====
+node_modules/
+**/node_modules/
+
+# ===== Build / compilação =====
+# Backend (Maven)
+target/
+**/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Frontend (Angular)
+dist/
+**/dist/
+.angular/
+**/.angular/
+
+# ===== Logs =====
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===== IDEs / Editores =====
+.idea/
+*.iml
+.vscode/
+!.vscode/launch.json
+*.swp
+*.swo
+
+# ===== Sistema Operacional =====
+.DS_Store
+Thumbs.db
+
+# ===== Ambiente / Segredos =====
+.env
+.env.local
+*.local
+
+# ===== Testes =====
+coverage/
+**/coverage/
