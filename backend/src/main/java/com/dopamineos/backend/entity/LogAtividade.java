@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
+@Table(name = "tb_log_atividade")
 public class LogAtividade {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,10 +17,9 @@ public class LogAtividade {
     private String icone;
     private int xpGanho;
     private int duracaoMinutos;
-
     private LocalDateTime dataHora;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 }

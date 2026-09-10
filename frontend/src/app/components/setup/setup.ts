@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GameService, ClasseRPG, Protocolo, Atributo, Dificuldade } from '../../services/game.service';
-import { switchMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-setup',
@@ -93,23 +92,15 @@ export class SetupComponent {
     this.loading = true;
     this.erro = '';
 
-    this.gameService.setup(this.nome, this.classeSelecionada)
-      .pipe(
-        switchMap((usuarioCriado) => {
-          if (this.missoesSelecionadas.length > 0) {
-            return this.gameService.salvarMissoes(this.missoesSelecionadas);
-          } else {
-            return of([]);
-          }
-        })
-      )
+    // Envia nome, classe e missões selecionadas num único POST /setup
+    this.gameService.setup(this.nome, this.classeSelecionada, this.missoesSelecionadas)
       .subscribe({
         next: () => {
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {
           console.error(err);
-          this.erro = 'Erro ao criar personagem.';
+          this.erro = 'Erro ao criar personagem. Tente novamente.';
           this.loading = false;
         }
       });

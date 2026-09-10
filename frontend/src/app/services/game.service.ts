@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 // 1. ENUMS
 export enum Atributo {
@@ -32,7 +32,7 @@ export interface LogAtividade {
   icone: string;
   xpGanho: number;
   duracaoMinutos: number;
-  dataHora: string;
+  dataHora: string; // ISO string (LocalDateTime serializado pelo Jackson)
 }
 
 export interface Protocolo {
@@ -46,7 +46,6 @@ export interface Protocolo {
   duracaoMinutos: number;
 }
 
-
 export interface Usuario {
   id: number;
   nome: string;
@@ -55,27 +54,21 @@ export interface Usuario {
   xpAtual: number;
   xpParaProximoNivel: number;
   moedas: number;
-
-  // Atributos
   forca: number;
   destreza: number;
   intelecto: number;
   carisma: number;
   constituicao: number;
-
-  // Recursos
   hpAtual: number;
   maxHp: number;
   mpAtual: number;
   maxMp: number;
 }
 
-export interface StandardError {
-  timestamp: string;
-  status: number;
-  error: string;
-  message: string;
-  path: string;
+export interface SetupPayload {
+  nome: string;
+  classe: ClasseRPG;
+  missoes?: Protocolo[];
 }
 
 // 3. O SERVIÇO
@@ -84,42 +77,43 @@ export interface StandardError {
   providedIn: 'root'
 })
 export class GameService {
-  private apiUrl = 'http://localhost:8080/api/v1/game';
-  
-  constructor(private http: HttpClient) { }
+  private readonly apiUrl = 'http://localhost:8080/api/v1/game';
 
-  // 1. Pegar Perfil
+  constructor(private http: HttpClient) {}
+
   getPerfil(): Observable<Usuario> {
     return this.http.get<Usuario>(`${this.apiUrl}/perfil`);
   }
 
-  // 2. Listar Missões
   getProtocolos(): Observable<Protocolo[]> {
     return this.http.get<Protocolo[]>(`${this.apiUrl}/protocolos`);
   }
 
-  // 3. Criar Missão Única
   criarProtocolo(protocolo: Protocolo): Observable<Protocolo> {
     return this.http.post<Protocolo>(`${this.apiUrl}/protocolo`, protocolo);
   }
 
-  // 4. Salvar Várias Missões
   salvarMissoes(protocolos: Protocolo[]): Observable<Protocolo[]> {
     return this.http.post<Protocolo[]>(`${this.apiUrl}/protocolos`, protocolos);
   }
 
-  // 5. Fazer Check-in
+  deletarProtocolo(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/protocolo/${id}`);
+  }
+
   fazerCheckin(protocoloId: number): Observable<Usuario> {
     return this.http.post<Usuario>(`${this.apiUrl}/checkin/${protocoloId}`, {});
   }
 
-  // 6. Setup Inicial
-  setup(nome: string, classe: ClasseRPG): Observable<Usuario> {
-    const payload = { nome, classe };
+  /**
+   * Envia nome, classe e, opcionalmente, as missões escolhidas pelo usuário.
+   * O backend cria o deck padrão se missoes estiver vazio.
+   */
+  setup(nome: string, classe: ClasseRPG, missoes: Protocolo[] = []): Observable<Usuario> {
+    const payload: SetupPayload = { nome, classe, missoes };
     return this.http.post<Usuario>(`${this.apiUrl}/setup`, payload);
   }
-  
-  // 7. Histórico Geral
+
   getHistoricoGeral(): Observable<LogAtividade[]> {
     return this.http.get<LogAtividade[]>(`${this.apiUrl}/historico`);
   }

@@ -80,18 +80,18 @@ export class DashboardComponent implements OnInit {
       error: (err) => console.error('Erro ao carregar protocolos', err)
     });
 
-    // 3. Carrega Histórico do Dia (implementar no backend)
-    // this.carregarHistorico();
+    // 3. Carrega Histórico do Dia
+    this.carregarHistorico();
   }
 
   carregarHistorico() {
-    // Exemplo de implementação futura:
-    /*
-    this.gameService.getHistorico(this.dataSelecionada).subscribe(logs => {
-      this.historico = logs;
-      this.recalcularMinutos();
+    this.gameService.getHistoricoGeral().subscribe({
+      next: (logs) => {
+        this.historico = logs;
+        this.totalMinutosHoje = logs.reduce((acc, l) => acc + l.duracaoMinutos, 0);
+      },
+      error: (err) => console.error('Erro ao carregar histórico', err)
     });
-    */
   }
 
   atualizarGrafico(u: Usuario) {
@@ -110,9 +110,9 @@ export class DashboardComponent implements OnInit {
       next: (usuarioAtualizado) => {
         this.usuario = usuarioAtualizado;
         this.atualizarGrafico(usuarioAtualizado);
-        this.adicionarLogLocal(protocolo);
         this.loadingCheckin = false;
-        console.log(`Checkin realizado! XP Total: ${usuarioAtualizado.xpAtual}`);
+        // Recarrega histórico do backend para ter o xpGanho correto
+        this.carregarHistorico();
       },
       error: (err) => {
         this.loadingCheckin = false;
@@ -120,20 +120,6 @@ export class DashboardComponent implements OnInit {
         alert('Erro ao completar missão: ' + (err.error?.message || 'Erro de conexão'));
       }
     });
-  }
-
-  private adicionarLogLocal(protocolo: Protocolo) {
-    const novoLog: LogAtividade = {
-      id: Date.now(),
-      nomeMissao: protocolo.nome,
-      icone: protocolo.icone,
-      xpGanho: 0,
-      duracaoMinutos: protocolo.duracaoMinutos || 15,
-      dataHora: new Date().toISOString()
-    };
-    
-    this.historico = [novoLog, ...this.historico];
-    this.totalMinutosHoje += (protocolo.duracaoMinutos || 15);
   }
 
   get porcentagemXP(): number {

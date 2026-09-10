@@ -5,6 +5,7 @@ import com.dopamineos.backend.entity.Protocolo;
 import com.dopamineos.backend.entity.Usuario;
 import com.dopamineos.backend.entity.enums.Atributo;
 import com.dopamineos.backend.entity.enums.Dificuldade;
+import com.dopamineos.backend.exception.ResourceNotFoundException;
 import com.dopamineos.backend.repository.LogAtividadeRepository;
 import com.dopamineos.backend.repository.ProtocoloRepository;
 import com.dopamineos.backend.repository.UsuarioRepository;
@@ -25,8 +26,13 @@ public class GameService {
     private final ProtocoloRepository protocoloRepository;
     private final LogAtividadeRepository logAtividadeRepository;
 
+    /**
+     * Retorna o único jogador existente ou lança 404.
+     */
     public Usuario getPerfil() {
-        return usuarioRepository.findAll().stream().findFirst().orElse(null);
+        return usuarioRepository.findAll().stream()
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Nenhum personagem encontrado. Faça o Setup primeiro."));
     }
 
     public List<Protocolo> getProtocolos() {
@@ -37,57 +43,48 @@ public class GameService {
         return logAtividadeRepository.findByOrderByDataHoraDesc();
     }
 
+    /**
+     * Cria um novo personagem, apagando todos os dados anteriores.
+     * Ordem de delete respeitando FK: logs → protocolos → usuário.
+     */
     @Transactional
-    public Usuario setup(Usuario usuario, List<Protocolo> tarefasIniciais) {
+    public Usuario setup(Usuario usuario) {
         log.info("🚀 Iniciando Setup do Personagem...");
 
-        // 1. LIMPEZA TOTAL
-        logAtividadeRepository.deleteAll(); 
+        // 1. LIMPEZA na ordem correta (respeita FK: log → protocolo → usuario)
+        logAtividadeRepository.deleteAll();
         log.info("🧹 Histórico antigo apagado.");
-        
-        usuarioRepository.deleteAll(); 
-        log.info("🧹 Usuário antigo apagado.");
-        
+
         protocoloRepository.deleteAll();
         log.info("🧹 Missões antigas apagadas.");
 
-        // 2. CRIAÇÃO DO USUÁRIO
-        // Recalcula HP/MP baseado na classe escolhida
+        usuarioRepository.deleteAll();
+        log.info("🧹 Usuário antigo apagado.");
+
+        // 2. CRIAÇÃO DO USUÁRIO (resetarPersonagem calcula HP/MP/atributos da classe)
         usuario.resetarPersonagem(usuario.getNome(), usuario.getClasse());
         Usuario salvo = usuarioRepository.save(usuario);
         log.info("✨ Usuário criado: {} (Classe: {})", salvo.getNome(), salvo.getClasse());
-
-        // 3. CRIAÇÃO DAS MISSÕES
-        if (tarefasIniciais != null && !tarefasIniciais.isEmpty()) {
-            // Cenário A: Usuário escolheu missões no Frontend
-            protocoloRepository.saveAll(tarefasIniciais);
-            log.info("🃏 {} missões personalizadas salvas.", tarefasIniciais.size());
-        } else {
-            // Cenário B: Usuário não escolheu nada (Fallback)
-            log.info("🃏 Nenhuma missão selecionada. Criando Deck Padrão...");
-            criarMissoesPadrao();
-        }
 
         return salvo;
     }
 
     @Transactional
     public Usuario fazerCheckin(Long protocoloId) {
+        // getPerfil() já lança ResourceNotFoundException se não houver usuário
         Usuario user = getPerfil();
-        
-        // Busca a missão ou lança erro
-        Protocolo task = protocoloRepository.findById(protocoloId)
-                .orElseThrow(() -> new RuntimeException("Missão não encontrada com ID: " + protocoloId));
 
-        // 1. Lógica de RPG (Calcular recompensas)
-        int xpGanho = calcularXp(task.getDificuldade());
-        int goldGanho = calcularGold(task.getDificuldade());
-        
-        // Aplica no usuário
+        Protocolo task = protocoloRepository.findById(protocoloId)
+                .orElseThrow(() -> new ResourceNotFoundException("Missão não encontrada com ID: " + protocoloId));
+
+        // Usa os valores definidos no próprio enum Dificuldade (fonte única da verdade)
+        int xpGanho = task.getDificuldade() != null ? task.getDificuldade().getXpBase() : 10;
+        int goldGanho = task.getDificuldade() != null ? task.getDificuldade().getGoldBase() : 2;
+
         user.ganharXp(xpGanho);
         user.setMoedas(user.getMoedas() + goldGanho);
 
-        // 2. Salva no Histórico (Log)
+        // Registra no histórico
         LogAtividade logEntry = new LogAtividade();
         logEntry.setNomeMissao(task.getNome());
         logEntry.setIcone(task.getIcone());
@@ -95,12 +92,10 @@ public class GameService {
         logEntry.setDuracaoMinutos(task.getDuracaoMinutos());
         logEntry.setDataHora(LocalDateTime.now());
         logEntry.setUsuario(user);
-        
+
         logAtividadeRepository.save(logEntry);
+        log.info("✅ Checkin: {} (+{} XP, +{} gold)", task.getNome(), xpGanho, goldGanho);
 
-        log.info("✅ Checkin: {} (+{} XP)", task.getNome(), xpGanho);
-
-        // 3. Salva e retorna usuário atualizado
         return usuarioRepository.save(user);
     }
 
@@ -111,6 +106,9 @@ public class GameService {
 
     @Transactional
     public void deletarProtocolo(Long id) {
+        if (!protocoloRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Missão não encontrada com ID: " + id);
+        }
         protocoloRepository.deleteById(id);
     }
 
@@ -119,22 +117,23 @@ public class GameService {
         return protocoloRepository.saveAll(protocolos);
     }
 
-    private void criarMissoesPadrao() {
-        // Criação manual das missões padrão se o usuário não selecionar nada
+    /**
+     * Cria o deck padrão de missões associadas ao usuário informado.
+     */
+    public void criarMissoesPadrao(Usuario usuario) {
         List<Protocolo> padroes = List.of(
-            criar("Beber Água", "💧", Atributo.CONSTITUICAO, Dificuldade.EASY, 5),
-            criar("Alongamento", "🧘", Atributo.DESTREZA, Dificuldade.EASY, 10),
-            criar("Leitura Focada", "📚", Atributo.INTELECTO, Dificuldade.MEDIUM, 30),
-            criar("Treino Físico", "💪", Atributo.FORCA, Dificuldade.HARD, 60),
-            criar("Networking", "🤝", Atributo.CARISMA, Dificuldade.MEDIUM, 20),
-            criar("Sono Reparador", "💤", Atributo.CONSTITUICAO, Dificuldade.EPIC, 480)
+            criar("Beber Água",     "💧", Atributo.CONSTITUICAO, Dificuldade.EASY,   5,   usuario),
+            criar("Alongamento",   "🧘", Atributo.DESTREZA,     Dificuldade.EASY,   10,  usuario),
+            criar("Leitura Focada","📚", Atributo.INTELECTO,    Dificuldade.MEDIUM, 30,  usuario),
+            criar("Treino Físico", "💪", Atributo.FORCA,        Dificuldade.HARD,   60,  usuario),
+            criar("Networking",    "🤝", Atributo.CARISMA,      Dificuldade.MEDIUM, 20,  usuario),
+            criar("Sono Reparador","💤", Atributo.CONSTITUICAO, Dificuldade.EPIC,   480, usuario)
         );
-        
         protocoloRepository.saveAll(padroes);
+        log.info("🃏 Deck padrão criado: {} missões.", padroes.size());
     }
 
-    // Helper para instanciar Protocolo rapidamente
-    private Protocolo criar(String nome, String icone, Atributo atr, Dificuldade dif, int minutos) {
+    private Protocolo criar(String nome, String icone, Atributo atr, Dificuldade dif, int minutos, Usuario usuario) {
         Protocolo p = new Protocolo();
         p.setNome(nome);
         p.setIcone(icone);
@@ -142,26 +141,7 @@ public class GameService {
         p.setDificuldade(dif);
         p.setDuracaoMinutos(minutos);
         p.setDescricao("Rotina Inicial");
+        p.setUsuario(usuario);
         return p;
-    }
-
-    private int calcularXp(Dificuldade d) {
-        if (d == null) return 10;
-        return switch (d) {
-            case EASY -> 15;
-            case MEDIUM -> 30;
-            case HARD -> 50;
-            case EPIC -> 100;
-        };
-    }
-
-    private int calcularGold(Dificuldade d) {
-        if (d == null) return 5;
-        return switch (d) {
-            case EASY -> 5;
-            case MEDIUM -> 10;
-            case HARD -> 20;
-            case EPIC -> 50;
-        };
     }
 }

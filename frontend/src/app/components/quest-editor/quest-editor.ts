@@ -73,9 +73,11 @@ export class QuestEditorComponent implements OnInit {
 
   deletar(id: number | undefined) {
     if (!id) return;
-    if(confirm('Rasgar este contrato de missão?')) {
-       // this.gameService.deletarProtocolo(id).subscribe(() => this.carregar());
-       alert('Implemente o DELETE no backend primeiro!'); 
+    if (confirm('Rasgar este contrato de missão?')) {
+      this.gameService.deletarProtocolo(id).subscribe({
+        next: () => this.carregar(),
+        error: (err) => alert('Erro ao deletar missão: ' + (err.error?.message || 'Erro de conexão'))
+      });
     }
   }
 
