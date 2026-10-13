@@ -3,8 +3,6 @@ package com.lumeos.backend.support;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * Base reutilizável para testes de integração (Design §33).
@@ -20,15 +18,22 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * aceite as entidades legadas ({@code Usuario}/{@code Protocolo}/{@code LogAtividade}) ainda
  * mapeadas (Design §10). Isso torna o teste independente do perfil ativo.
  *
- * <p>O container é {@code static} e compartilhado entre os testes da mesma classe (reuso de
- * recurso); o ciclo de vida é gerenciado por {@link Testcontainers}.
+ * <p><strong>Container singleton:</strong> o PostgreSQL é iniciado UMA ÚNICA vez e compartilhado
+ * por TODAS as classes de teste de integração (padrão singleton container do Testcontainers).
+ * O ciclo {@code @Container}/{@code @Testcontainers} prende o container à classe e o encerra ao
+ * fim dela; como o Spring faz cache do contexto (datasource) entre classes de teste com a mesma
+ * configuração, reiniciar o container por classe deixaria o datasource cacheado apontando para um
+ * container já parado (conexão recusada). Com o singleton, a URL permanece válida entre as classes;
+ * o container é derrubado pelo Ryuk no encerramento da JVM.
  */
-@Testcontainers
 public abstract class AbstractPostgresIT {
 
-    @Container
     protected static final PostgreSQLContainer<?> POSTGRES =
             new PostgreSQLContainer<>("postgres:16-alpine");
+
+    static {
+        POSTGRES.start();
+    }
 
     @DynamicPropertySource
     static void registerDatasourceProperties(DynamicPropertyRegistry registry) {

@@ -55,6 +55,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
+        <!--
+            spring-security-crypto fornece o BCryptPasswordEncoder usado para hashear senhas
+            (REQ-001/RNF-03). Apenas a biblioteca de cripto, SEM a cadeia completa de segurança
+            (spring-boot-starter-security chega na task 1.2). Versão gerenciada pelo parent.
+        -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>

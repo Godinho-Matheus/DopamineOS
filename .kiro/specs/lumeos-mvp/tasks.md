@@ -123,16 +123,16 @@ As tarefas estão organizadas nos sprints a seguir; cada seção de sprint cont�
 
 **Objetivo:** introduzir identidade de usuário, autenticação (JWT em cookie HttpOnly + CSRF), isolamento por token, Household com convites e o onboarding no frontend. Backend primeiro, depois frontend. Parte do estado do Sprint 0. Nenhuma funcionalidade multiusuário de negócio é liberada antes de auth + Household.
 
-- [ ] 1.1 Domínio de identidade (User) `[REQ-002, REQ-001, RNF-03]` (Design §8, §9, §12.2) — Depende de 0.3, 0.4
+- [x] 1.1 Domínio de identidade (User) `[REQ-002, REQ-001, RNF-03]` (Design §8, §9, §12.2) — Depende de 0.3, 0.4
   - Resultado esperado: entidade `User` separada de qualquer dado de RPG; e-mail normalizado e único case-insensitive; senha em BCrypt.
   - Validação: `mvn verify`; teste de normalização/unicidade de e-mail.
-  - [ ] 1.1.1 Entidade `User` (tabela `users`: `id`, `nome`, `email`, `password_hash`, `created_at` TIMESTAMPTZ) sem campos de personagem
-  - [ ] 1.1.2 `UserRepository` com `findByEmail` sobre e-mail normalizado (lower-case)
-  - [ ] 1.1.3 DTOs `RegisterRequest {nome,email,senha}`, `LoginRequest {email,senha}`, `UserResponse {id,nome,email}` (sem `passwordHash`)
-  - [ ] 1.1.4 Mapper MapStruct User ↔ DTOs
-  - [ ] 1.1.5 Adicionar dependência `spring-security-crypto` e expor um bean `PasswordEncoder`/`BCryptPasswordEncoder` utilizável pelo `UserService` (leve, sem cadeia de segurança completa — esta chega em 1.2)
-  - [ ] 1.1.6 `UserService`: normalização de e-mail (trim+lowercase), hash BCrypt (via `PasswordEncoder` do `spring-security-crypto` adicionado em 1.1), validação de `nome` 1..100 e `senha` 8..72
-  - [ ] 1.1.7 Testes: criação com hash BCrypt; e-mail duplicado/case-insensitive rejeitado; `passwordHash` nunca exposto
+  - [x] 1.1.1 Entidade `User` (tabela `users`: `id`, `nome`, `email`, `password_hash`, `created_at` TIMESTAMPTZ) sem campos de personagem
+  - [x] 1.1.2 `UserRepository` com `findByEmail` sobre e-mail normalizado (lower-case)
+  - [x] 1.1.3 DTOs `RegisterRequest {nome,email,senha}`, `LoginRequest {email,senha}`, `UserResponse {id,nome,email}` (sem `passwordHash`)
+  - [x] 1.1.4 Mapper MapStruct User ↔ DTOs
+  - [x] 1.1.5 Adicionar dependência `spring-security-crypto` e expor um bean `PasswordEncoder`/`BCryptPasswordEncoder` utilizável pelo `UserService` (leve, sem cadeia de segurança completa — esta chega em 1.2)
+  - [x] 1.1.6 `UserService`: normalização de e-mail (trim+lowercase), hash BCrypt (via `PasswordEncoder` do `spring-security-crypto` adicionado em 1.1), validação de `nome` 1..100 e `senha` 8..72
+  - [x] 1.1.7 Testes: criação com hash BCrypt; e-mail duplicado/case-insensitive rejeitado; `passwordHash` nunca exposto
 
 - [ ] 1.2 Spring Security + JWT em cookie HttpOnly `[REQ-001, REQ-015, RNF-02]` (Design §12) — Depende de 1.1
   - Resultado esperado: cadeia de segurança stateless com JWT HS256 em cookie `LUMEOS_SESSION`; `JWT_SECRET` obrigatório falha a inicialização em prod; `GET /actuator/health` público.
