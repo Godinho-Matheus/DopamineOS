@@ -59,54 +59,54 @@ As tarefas estão organizadas nos sprints a seguir; cada seção de sprint cont�
   - [x] 0.1.5 Atualizar README e `docs/` (SETUP, TUTORIAL) para a marca LumeOS
   - [x] 0.1.6* Testes de fumaça: `BackendApplicationTests.contextLoads` segue verde; teste de smoke do frontend compila após rename
 
-- [ ] 0.2 Configuração por ambiente e remoção de segredos `[REQ-015, REQ-016, RNF-06, RNF-14]` (Design §23) — Depende de 0.1
+- [x] 0.2 Configuração por ambiente e remoção de segredos `[REQ-015, REQ-016, RNF-06, RNF-14]` (Design §23) — Depende de 0.1
   - Resultado esperado: perfis Spring separados; segredos vindos de variáveis de ambiente; nenhuma credencial no repositório.
   - Validação: aplicação inicia em dev lendo variáveis de ambiente; `mvn verify` verde.
-  - [ ] 0.2.1 Converter `application.properties` em `application.yml` (base) + `application-dev.yml` + `application-prod.yml`
-  - [ ] 0.2.2 Externalizar config via variáveis: `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `JWT_TTL`, `SPRING_PROFILES_ACTIVE`, `COOKIE_SECURE`, `CORS_ALLOWED_ORIGINS`
-  - [ ] 0.2.3 Remover credenciais hardcoded do datasource; dev lê das variáveis (sem valores padrão sensíveis commitados)
-  - [ ] 0.2.4 Produção: `show-sql=false`, `server.error.include-stacktrace=never`; dev: `show-sql=true`
-  - [ ] 0.2.5 CORS por ambiente a partir de `CORS_ALLOWED_ORIGINS` (dev inclui `http://localhost:4200`), substituindo origem fixa em `CorsConfig`
-  - [ ] 0.2.6 Preparar `application.yml` para `JWT_SECRET`/`JWT_TTL` (chaves presentes); a validação de obrigatoriedade em prod chega com a segurança no Sprint 1 (dependência real)
-  - [ ] 0.2.7* Teste: contexto sobe em dev lendo variáveis de ambiente; ausência de variável de banco em dev usa valor de desenvolvimento documentado (não segredo)
+  - [x] 0.2.1 Converter `application.properties` em `application.yml` (base) + `application-dev.yml` + `application-prod.yml`
+  - [x] 0.2.2 Externalizar config via variáveis: `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `JWT_TTL`, `SPRING_PROFILES_ACTIVE`, `COOKIE_SECURE`, `CORS_ALLOWED_ORIGINS`
+  - [x] 0.2.3 Remover credenciais hardcoded do datasource; dev lê das variáveis (sem valores padrão sensíveis commitados)
+  - [x] 0.2.4 Produção: `show-sql=false`, `server.error.include-stacktrace=never`; dev: `show-sql=true`
+  - [x] 0.2.5 CORS por ambiente a partir de `CORS_ALLOWED_ORIGINS` (dev inclui `http://localhost:4200`), substituindo origem fixa em `CorsConfig`
+  - [x] 0.2.6 Preparar `application.yml` para `JWT_SECRET`/`JWT_TTL` (chaves presentes); a validação de obrigatoriedade em prod chega com a segurança no Sprint 1 (dependência real)
+  - [x] 0.2.7* Teste: contexto sobe em dev lendo variáveis de ambiente; ausência de variável de banco em dev usa valor de desenvolvimento documentado (não segredo)
 
-- [ ] 0.3 Flyway e baseline do schema LumeOS (banco novo/vazio) `[REQ-014, REQ-012, RNF-03, RNF-15]` (Design §9, §10) — Depende de 0.2, 0.6
+- [x] 0.3 Flyway e baseline do schema LumeOS (banco novo/vazio) `[REQ-014, REQ-012, RNF-03, RNF-15]` (Design §9, §10) — Depende de 0.2, 0.6
   - Resultado esperado: schema versionado por Flyway em banco/schema **novo e vazio**; `ddl-auto=validate`; backup `pg_dump` do banco legado documentado como pré-requisito. Nenhuma tabela `tb_*` é removida.
   - Validação: aplicação inicia aplicando `V1`; `mvn verify` com Testcontainers valida o schema.
-  - [ ] 0.3.1 Adicionar dependências `flyway-core` e `flyway-database-postgresql`
-  - [ ] 0.3.2 Definir `spring.jpa.hibernate.ddl-auto=validate` (dev e prod) e habilitar Flyway; migrações em `src/main/resources/db/migration`
-  - [ ] 0.3.3 Criar `V1__baseline.sql` criando as tabelas `users, game_profiles, households, household_members, household_invites, habits, activity_logs, shopping_lists, shopping_items, reading_entries`
-  - [ ] 0.3.4 Constraints/índices do design: índice único funcional `UNIQUE (lower(email))`; `game_profiles.user_id` UNIQUE; `game_profiles.version` BIGINT NOT NULL; `household_members.user_id` UNIQUE; `household_invites.invite_token_hash` UNIQUE
-  - [ ] 0.3.5 Constraints/índices restantes: índice único parcial `UNIQUE(household_id) WHERE active=true` em `shopping_lists`; `activity_logs.habit_id` NULLABLE `ON DELETE SET NULL`; `reading_entries` CHECK `nota 1..5` e CHECK `data_fim >= data_inicio`; índices `(user_id, data_hora DESC)`, `(shopping_list_id, comprado)`, `(user_id, status)`, idx FKs
-  - [ ] 0.3.6 Tipos/tempo conforme design: `quantidade` NUMERIC(12,3); timestamps TIMESTAMPTZ; `data_inicio`/`data_fim` DATE
-  - [ ] 0.3.7 Documentar em `docs/DEPLOY_VPS.md` (ou doc de migração) o `pg_dump -Fc` OBRIGATÓRIO do banco legado ANTES de apontar para o banco novo; NÃO remover `tb_usuario`/`tb_protocolos`/`tb_log_atividade`
-  - [ ] 0.3.8 Migração de compatibilidade APENAS para dev/test (legacy-compat): criar migração Flyway que cria as tabelas legadas `tb_usuario`, `tb_protocolos`, `tb_log_atividade` compatíveis com as entidades JPA legadas ainda mapeadas (`Usuario`, `Protocolo`, `LogAtividade`), de modo que `ddl-auto=validate` passe enquanto o legado ainda existe. Escopo dev/test via `spring.flyway.locations` com uma localização extra de dev/test (ex.: `db/migration-devtest`) OU migração protegida por perfil (dev/test); explicitamente NÃO faz parte do schema de produção (produção não aplica essa migração e mantém o schema limpo). Manter `ddl-auto=validate` (nunca `update`); nunca apagar/alterar o banco legado original ou seus dados.
+  - [x] 0.3.1 Adicionar dependências `flyway-core` e `flyway-database-postgresql`
+  - [x] 0.3.2 Definir `spring.jpa.hibernate.ddl-auto=validate` (dev e prod) e habilitar Flyway; migrações em `src/main/resources/db/migration`
+  - [x] 0.3.3 Criar `V1__baseline.sql` criando as tabelas `users, game_profiles, households, household_members, household_invites, habits, activity_logs, shopping_lists, shopping_items, reading_entries`
+  - [x] 0.3.4 Constraints/índices do design: índice único funcional `UNIQUE (lower(email))`; `game_profiles.user_id` UNIQUE; `game_profiles.version` BIGINT NOT NULL; `household_members.user_id` UNIQUE; `household_invites.invite_token_hash` UNIQUE
+  - [x] 0.3.5 Constraints/índices restantes: índice único parcial `UNIQUE(household_id) WHERE active=true` em `shopping_lists`; `activity_logs.habit_id` NULLABLE `ON DELETE SET NULL`; `reading_entries` CHECK `nota 1..5` e CHECK `data_fim >= data_inicio`; índices `(user_id, data_hora DESC)`, `(shopping_list_id, comprado)`, `(user_id, status)`, idx FKs
+  - [x] 0.3.6 Tipos/tempo conforme design: `quantidade` NUMERIC(12,3); timestamps TIMESTAMPTZ; `data_inicio`/`data_fim` DATE
+  - [x] 0.3.7 Documentar em `docs/DEPLOY_VPS.md` (ou doc de migração) o `pg_dump -Fc` OBRIGATÓRIO do banco legado ANTES de apontar para o banco novo; NÃO remover `tb_usuario`/`tb_protocolos`/`tb_log_atividade`
+  - [x] 0.3.8 Migração de compatibilidade APENAS para dev/test (legacy-compat): criar migração Flyway que cria as tabelas legadas `tb_usuario`, `tb_protocolos`, `tb_log_atividade` compatíveis com as entidades JPA legadas ainda mapeadas (`Usuario`, `Protocolo`, `LogAtividade`), de modo que `ddl-auto=validate` passe enquanto o legado ainda existe. Escopo dev/test via `spring.flyway.locations` com uma localização extra de dev/test (ex.: `db/migration-devtest`) OU migração protegida por perfil (dev/test); explicitamente NÃO faz parte do schema de produção (produção não aplica essa migração e mantém o schema limpo). Manter `ddl-auto=validate` (nunca `update`); nunca apagar/alterar o banco legado original ou seus dados.
     - Nota: isto garante que os Sprints 0, 1 e o início do Sprint 2 iniciem de forma limpa com `ddl-auto=validate` enquanto as entidades legadas ainda existem; o schema de produção permanece limpo; nenhum dado legado é apagado. Após a remoção do legado (Sprint 2), as entidades legadas deixam de existir e `validate` não requer mais essas tabelas, tornando a compatibilidade desnecessária; ela é então aposentada por uma migration de cleanup POSTERIOR (dev/test) que dropa as tabelas de compatibilidade — sem apagar esta migration original do histórico Flyway (ver 2.10).
-  - [ ] 0.3.9 Teste de integração (Testcontainers PostgreSQL): Flyway aplica `V1` em schema vazio e `ddl-auto=validate` passa
-  - [ ] 0.3.10 Teste (dev/test): o contexto da aplicação inicia com `ddl-auto=validate` enquanto as entidades legadas (`Usuario`/`Protocolo`/`LogAtividade`) ainda estão mapeadas (tabelas de compatibilidade `tb_usuario`/`tb_protocolos`/`tb_log_atividade` presentes)
+  - [x] 0.3.9 Teste de integração (Testcontainers PostgreSQL): Flyway aplica `V1` em schema vazio e `ddl-auto=validate` passa
+  - [x] 0.3.10 Teste (dev/test): o contexto da aplicação inicia com `ddl-auto=validate` enquanto as entidades legadas (`Usuario`/`Protocolo`/`LogAtividade`) ainda estão mapeadas (tabelas de compatibilidade `tb_usuario`/`tb_protocolos`/`tb_log_atividade` presentes)
 
-- [ ] 0.4 Estrutura base do backend por domínio (progressiva) `[REQ-013, RNF-10]` (Design §6.2, §6.3) — Depende de 0.1
+- [x] 0.4 Estrutura base do backend por domínio (progressiva) `[REQ-013, RNF-10]` (Design §6.2, §6.3) — Depende de 0.1
   - Resultado esperado: pacotes de domínio criados conforme a necessidade (`common`, `identity`, `household`, `gamification`, `habits`, `shopping`, `library`), sem classes vazias apenas para estrutura; build compilável.
   - Validação: `mvn verify` verde.
-  - [ ] 0.4.1 Criar pacote `common` e mover `GlobalExceptionHandler`/`StandardError`/exceções base para `common.exception`; CORS/config para `common.config`
-  - [ ] 0.4.2 Introduzir os pacotes de domínio apenas quando houver conteúdo real a mover; manter controller/service legados de gamificação funcionando durante a transição
+  - [x] 0.4.1 Criar pacote `common` e mover `GlobalExceptionHandler`/`StandardError`/exceções base para `common.exception`; CORS/config para `common.config`
+  - [x] 0.4.2 Introduzir os pacotes de domínio apenas quando houver conteúdo real a mover; manter controller/service legados de gamificação funcionando durante a transição
 
-- [ ] 0.5 Estrutura base do frontend por features (progressiva) e API relativa `[REQ-016, REQ-017, RNF-10]` (Design §7.2, §7.3) — Depende de 0.1
+- [x] 0.5 Estrutura base do frontend por features (progressiva) e API relativa `[REQ-016, REQ-017, RNF-10]` (Design §7.2, §7.3) — Depende de 0.1
   - Resultado esperado: camadas `core/layout/features/shared` iniciadas gradualmente; URL absoluta de API removida; proxy de desenvolvimento `/api` → `localhost:8080`; funcionalidade existente permanece compilável.
   - Validação: `npm run build` e `npm test -- --run` verdes; chamadas usam caminho relativo.
-  - [ ] 0.5.1 Remover `apiUrl='http://localhost:8080/api/v1/game'` do `game.service.ts`; usar caminho relativo `/api/v1/...`
-  - [ ] 0.5.2 Criar `proxy.conf.json` (dev) encaminhando `/api` → `http://localhost:8080` e configurar `ng serve`/build para usá-lo
-  - [ ] 0.5.3 Introduzir diretórios `core/`, `layout/`, `features/`, `shared/` e mover apenas o que fizer sentido agora (sem quebrar rotas atuais)
-  - [ ] 0.5.4 Teste: `game.service` compila e aponta para caminho relativo `/api/v1/...` (verifica REQ-016/REQ-017 — mesma origem/API relativa); smoke do app segue verde
+  - [x] 0.5.1 Remover `apiUrl='http://localhost:8080/api/v1/game'` do `game.service.ts`; usar caminho relativo `/api/v1/...`
+  - [x] 0.5.2 Criar `proxy.conf.json` (dev) encaminhando `/api` → `http://localhost:8080` e configurar `ng serve`/build para usá-lo
+  - [x] 0.5.3 Introduzir diretórios `core/`, `layout/`, `features/`, `shared/` e mover apenas o que fizer sentido agora (sem quebrar rotas atuais)
+  - [x] 0.5.4 Teste: `game.service` compila e aponta para caminho relativo `/api/v1/...` (verifica REQ-016/REQ-017 — mesma origem/API relativa); smoke do app segue verde
 
-- [ ] 0.6 Base técnica de testes `[REQ-023, RNF-08]` (Design §33) — Depende de 0.1
+- [x] 0.6 Base técnica de testes `[REQ-023, RNF-08]` (Design §33) — Depende de 0.1
   - Resultado esperado: apenas JUnit 5 no backend; Testcontainers PostgreSQL preparado; builds de backend e frontend validados.
   - Validação: `mvn verify` e `npm test -- --run` verdes.
-  - [ ] 0.6.1 Remover dependência TestNG não usada do `pom.xml`; manter JUnit 5
-  - [ ] 0.6.2 Adicionar dependências de Testcontainers (PostgreSQL) e infraestrutura base de teste de integração
-  - [ ] 0.6.3* Teste de integração mínimo com Testcontainers (sobe Postgres e aplica Flyway) para validar o pipeline de testes
+  - [x] 0.6.1 Remover dependência TestNG não usada do `pom.xml`; manter JUnit 5
+  - [x] 0.6.2 Adicionar dependências de Testcontainers (PostgreSQL) e infraestrutura base de teste de integração
+  - [x] 0.6.3* Teste de integração mínimo com Testcontainers (sobe Postgres e aplica Flyway) para validar o pipeline de testes
 
-- [ ] 0.7 Checkpoint do Sprint 0
+- [x] 0.7 Checkpoint do Sprint 0
   - Garantir que todos os testes passem; em caso de dúvidas, perguntar ao usuário.
 
 **Critérios de saída (Sprint 0):** projeto renomeado para LumeOS com histórico preservado; configuração por ambiente sem segredos versionados; Flyway aplicando `V1` em banco novo/vazio com todas as constraints; a aplicação inicia ao final de cada task da Sprint 0 com `ddl-auto=validate` (a migração de compatibilidade dev/test cobre as entidades legadas ainda presentes, de modo que `validate` nunca exige uma tabela ausente); estruturas base de backend/frontend iniciadas; TestNG removido e Testcontainers preparado; backend e frontend compiláveis; nenhuma tabela legada removida.

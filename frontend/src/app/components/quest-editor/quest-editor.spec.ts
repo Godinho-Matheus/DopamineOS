@@ -1,18 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 
-import { QuestEditor } from './quest-editor';
+import { QuestEditorComponent } from './quest-editor';
 
-describe('QuestEditor', () => {
-  let component: QuestEditor;
-  let fixture: ComponentFixture<QuestEditor>;
+describe('QuestEditorComponent', () => {
+  let component: QuestEditorComponent;
+  let fixture: ComponentFixture<QuestEditorComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [QuestEditor]
+      imports: [QuestEditorComponent],
+      providers: [provideHttpClient(), provideRouter([])]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(QuestEditor);
+    fixture = TestBed.createComponent(QuestEditorComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

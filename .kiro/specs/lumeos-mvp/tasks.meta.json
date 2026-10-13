@@ -12,6 +12,61 @@
         "chatSessionId": "sess_2af3cd1d-3a9a-449d-a7de-11935b45d8f1",
         "timestamp": 1791900415836
       }
+    ],
+    "0.2 Configuração por ambiente e remoção de segredos `[REQ-015, REQ-016, RNF-06, RNF-14]` (Design §23) — Depende de 0.1": [
+      {
+        "executionId": "b954498e-6614-4665-8885-b2d751a6f06b",
+        "chatSessionId": "sess_2af3cd1d-3a9a-449d-a7de-11935b45d8f1",
+        "timestamp": 1791900713036
+      },
+      {
+        "executionId": "b954498e-6614-4665-8885-b2d751a6f06b",
+        "chatSessionId": "sess_2af3cd1d-3a9a-449d-a7de-11935b45d8f1",
+        "timestamp": 1791901962522
+      }
+    ],
+    "0.6 Base técnica de testes `[REQ-023, RNF-08]` (Design §33) — Depende de 0.1": [
+      {
+        "executionId": "1df880b3-4668-47d2-974e-a95594167758",
+        "chatSessionId": "sess_2af3cd1d-3a9a-449d-a7de-11935b45d8f1",
+        "timestamp": 1791902270134
+      }
+    ],
+    "0.4 Estrutura base do backend por domínio (progressiva) `[REQ-013, RNF-10]` (Design §6.2, §6.3) — Depende de 0.1": [
+      {
+        "executionId": "1df880b3-4668-47d2-974e-a95594167758",
+        "chatSessionId": "sess_2af3cd1d-3a9a-449d-a7de-11935b45d8f1",
+        "timestamp": 1791903876108
+      },
+      {
+        "executionId": "38b438da-e5f7-44a8-9251-059b547ce9a8",
+        "chatSessionId": "sess_2af3cd1d-3a9a-449d-a7de-11935b45d8f1",
+        "timestamp": 1791905282737
+      },
+      {
+        "executionId": "38b438da-e5f7-44a8-9251-059b547ce9a8",
+        "chatSessionId": "sess_2af3cd1d-3a9a-449d-a7de-11935b45d8f1",
+        "timestamp": 1791906350893
+      }
+    ],
+    "0.5 Estrutura base do frontend por features (progressiva) e API relativa `[REQ-016, REQ-017, RNF-10]` (Design §7.2, §7.3) — Depende de 0.1": [
+      {
+        "executionId": "38b438da-e5f7-44a8-9251-059b547ce9a8",
+        "chatSessionId": "sess_2af3cd1d-3a9a-449d-a7de-11935b45d8f1",
+        "timestamp": 1791906356552
+      }
+    ],
+    "0.3 Flyway e baseline do schema LumeOS (banco novo/vazio) `[REQ-014, REQ-012, RNF-03, RNF-15]` (Design §9, §10) — Depende de 0.2, 0.6": [
+      {
+        "executionId": "38b438da-e5f7-44a8-9251-059b547ce9a8",
+        "chatSessionId": "sess_2af3cd1d-3a9a-449d-a7de-11935b45d8f1",
+        "timestamp": 1791906981688
+      },
+      {
+        "executionId": "38b438da-e5f7-44a8-9251-059b547ce9a8",
+        "chatSessionId": "sess_2af3cd1d-3a9a-449d-a7de-11935b45d8f1",
+        "timestamp": 1791911091383
+      }
     ]
   }
 }
