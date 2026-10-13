@@ -77,6 +77,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+
+        <!--
+            Emissão e validação de JWT HS256 (microentrega B2 / task 1.2.2) usando os
+            NimbusJwtEncoder/NimbusJwtDecoder do próprio Spring Security. Versão gerenciada
+            pelo parent. Não usar jjwt nem outra biblioteca JWT.
+        -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
