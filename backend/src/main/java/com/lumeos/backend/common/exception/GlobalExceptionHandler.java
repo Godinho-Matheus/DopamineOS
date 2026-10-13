@@ -1,4 +1,4 @@
-package com.lumeos.backend.exception;
+package com.lumeos.backend.common.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;

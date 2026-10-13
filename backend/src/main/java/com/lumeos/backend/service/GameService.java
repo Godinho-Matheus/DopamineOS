@@ -5,7 +5,7 @@ import com.lumeos.backend.entity.Protocolo;
 import com.lumeos.backend.entity.Usuario;
 import com.lumeos.backend.entity.enums.Atributo;
 import com.lumeos.backend.entity.enums.Dificuldade;
-import com.lumeos.backend.exception.ResourceNotFoundException;
+import com.lumeos.backend.common.exception.ResourceNotFoundException;
 import com.lumeos.backend.repository.LogAtividadeRepository;
 import com.lumeos.backend.repository.ProtocoloRepository;
 import com.lumeos.backend.repository.UsuarioRepository;

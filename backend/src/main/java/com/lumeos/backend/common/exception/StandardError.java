@@ -1,4 +1,4 @@
-package com.lumeos.backend.exception;
+package com.lumeos.backend.common.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
