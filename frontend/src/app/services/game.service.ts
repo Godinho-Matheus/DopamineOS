@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API_BASE } from '../core/config/api.config';
 
 // 1. ENUMS
 export enum Atributo {
@@ -77,7 +78,7 @@ export interface SetupPayload {
   providedIn: 'root'
 })
 export class GameService {
-  private readonly apiUrl = 'http://localhost:8080/api/v1/game';
+  private readonly apiUrl = `${API_BASE}/game`;
 
   constructor(private http: HttpClient) {}
 
