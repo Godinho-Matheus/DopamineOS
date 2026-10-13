@@ -65,6 +65,18 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
         </dependency>
+
+        <!--
+            Cadeia completa de Spring Security (task 1.2 / microentrega B1). Introduz o
+            SecurityFilterChain stateless que distingue requisições públicas de protegidas.
+            Reutiliza o PasswordEncoder (BCrypt) já definido em common.security
+            (PasswordEncoderConfig, criado na 1.1), sem redefini-lo. Versão gerenciada pelo
+            parent (spring-boot-dependencies 3.3.1), portanto não é fixada.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
