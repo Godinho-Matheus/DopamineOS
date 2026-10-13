@@ -22,26 +22,36 @@ Confirme que você tem tudo instalado antes de começar:
 
 ## 2. Configurar o banco de dados
 
-O LumeOS usa PostgreSQL. Ele espera, por padrão:
+O LumeOS usa PostgreSQL. A configuração vem de **variáveis de ambiente** (nenhum segredo é versionado). Os defaults de desenvolvimento são:
 
-| Configuração | Valor padrão                                  |
-|--------------|-----------------------------------------------|
-| URL          | `jdbc:postgresql://localhost:5432/postgres`   |
-| Usuário      | `postgres`                                    |
-| Senha        | `123456`                                       |
+| Variável          | Default (dev)   | Observação                                 |
+|-------------------|-----------------|--------------------------------------------|
+| `DB_HOST`         | `localhost`     | Host do PostgreSQL                          |
+| `DB_PORT`         | `5432`          | Porta do PostgreSQL                         |
+| `DB_NAME`         | `postgres`      | Banco                                       |
+| `DB_USER`         | `postgres`      | Usuário                                     |
+| `DB_PASSWORD`     | *(vazio)*       | **Sem default versionado** — defina a senha |
+
+> A URL é montada automaticamente como `jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}`.
 
 ### Passos
 1. Certifique-se de que o serviço do PostgreSQL está **rodando**.
 2. O banco `postgres` já existe por padrão em qualquer instalação — não precisa criar nada.
-3. Se sua senha for **diferente** de `123456`, edite o arquivo:
+3. Defina a senha do seu PostgreSQL local via variável de ambiente **antes** de subir o backend
+   (nunca comite a senha). Exemplos:
 
+   ```cmd
+   rem Windows (cmd) — sessão atual
+   set DB_PASSWORD=SUA_SENHA_AQUI
    ```
-   backend/src/main/resources/application.properties
+   ```bash
+   # Linux/macOS
+   export DB_PASSWORD=SUA_SENHA_AQUI
    ```
-   ```properties
-   spring.datasource.username=postgres
-   spring.datasource.password=SUA_SENHA_AQUI
-   ```
+
+   Você pode copiar `backend/.env.example` para `backend/.env` (não versionado) e preencher os valores
+   para carregar via seu runner/IDE. As demais variáveis (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`)
+   só precisam ser definidas se diferirem dos defaults de desenvolvimento acima.
 
 > As tabelas (`tb_usuario`, `tb_protocolos`, `tb_log_atividade`) são criadas **automaticamente** pelo Hibernate no primeiro boot. Você não precisa rodar nenhum script SQL.
 
@@ -120,12 +130,12 @@ Sempre suba nesta ordem:
 ### ❌ "Connection refused" / erro ao conectar no banco
 - O PostgreSQL está rodando?
 - A porta é mesmo 5432?
-- Usuário e senha em `application.properties` estão corretos?
+- As variáveis `DB_USER`/`DB_PASSWORD` estão corretas para o seu PostgreSQL?
 
 ### ❌ Porta 8080 já em uso
-Adicione no `application.properties`:
-```properties
-server.port=8081
+Defina a porta via variável de ambiente antes de subir o backend:
+```cmd
+set SERVER_PORT=8081
 ```
 E atualize a URL da API no frontend (`frontend/src/app/services/game.service.ts`):
 ```typescript
@@ -137,12 +147,13 @@ Rode o Angular em outra porta:
 ```cmd
 npm start -- --port 4300
 ```
-E ajuste a origem permitida no CORS (`backend/.../config/CorsConfig.java`) e/ou no `application.properties`.
+E ajuste a origem permitida de CORS via variável de ambiente `CORS_ALLOWED_ORIGINS`.
 
 ### ❌ Frontend mostra erro de CORS
-O backend só libera `http://localhost:4200` por padrão. Se você mudou a porta do frontend, atualize `CorsConfig.java`:
-```java
-config.setAllowedOrigins(List.of("http://localhost:4300"));
+O backend libera `http://localhost:4200` por padrão em dev. Se você mudou a porta do frontend,
+defina as origens permitidas via variável de ambiente (lista separada por vírgula):
+```cmd
+set CORS_ALLOWED_ORIGINS=http://localhost:4300
 ```
 
 ### ❌ "Nenhum personagem encontrado" (404)
