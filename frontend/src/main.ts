@@ -3,5 +3,5 @@ import { appConfig } from './app/app.config';
 import { App } from './app/app';
 
 bootstrapApplication(App, appConfig)
-  .then(() => console.log('🚀 DopamineOS iniciado com sucesso!'))
+  .then(() => console.log('🚀 LumeOS iniciado com sucesso!'))
   .catch((err) => console.error('❌ Erro fatal ao iniciar:', err));

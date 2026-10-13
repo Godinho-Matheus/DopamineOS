@@ -1,6 +1,6 @@
-# 🎓 Tutorial Básico — DopamineOS
+# 🎓 Tutorial Básico — LumeOS
 
-Este tutorial ensina a usar o DopamineOS do começo ao fim: criar seu personagem, cumprir missões e acompanhar sua evolução.
+Este tutorial ensina a usar o LumeOS do começo ao fim: criar seu personagem, cumprir missões e acompanhar sua evolução.
 
 > Antes de começar, certifique-se de que o backend e o frontend estão rodando. Veja o **[Guia de Execução](./SETUP.md)**. Com tudo no ar, acesse `http://localhost:4200`.
 

@@ -9,22 +9,22 @@ export const routes: Routes = [
     {
         path: 'setup',
         loadComponent: () => import('./components/setup/setup').then(m => m.SetupComponent),
-        title: 'DopamineOS - Setup'
+        title: 'LumeOS - Setup'
     },
     {
         path: 'dashboard',
         loadComponent: () => import('./components/dashboard/dashboard').then(m => m.DashboardComponent),
-        title: 'DopamineOS - Visão Geral'
+        title: 'LumeOS - Visão Geral'
     },
     {
         path: 'game/quest-editor',
         loadComponent: () => import('./components/quest-editor/quest-editor').then(m => m.QuestEditorComponent),
-        title: 'DopamineOS - Grimório'
+        title: 'LumeOS - Grimório'
     },
     {
         path: 'history',
         loadComponent: () => import('./components/history/history').then(m => m.HistoryComponent),
-        title: 'DopamineOS - Histórico'
+        title: 'LumeOS - Histórico'
     },
     {
         // Wildcard deve ser sempre a ÚLTIMA rota

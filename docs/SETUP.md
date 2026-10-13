@@ -1,6 +1,6 @@
-# 🚀 Guia de Execução — DopamineOS
+# 🚀 Guia de Execução — LumeOS
 
-Este guia mostra, do zero, como colocar o DopamineOS para rodar na sua máquina.
+Este guia mostra, do zero, como colocar o LumeOS para rodar na sua máquina.
 
 ---
 
@@ -22,7 +22,7 @@ Confirme que você tem tudo instalado antes de começar:
 
 ## 2. Configurar o banco de dados
 
-O DopamineOS usa PostgreSQL. Ele espera, por padrão:
+O LumeOS usa PostgreSQL. Ele espera, por padrão:
 
 | Configuração | Valor padrão                                  |
 |--------------|-----------------------------------------------|

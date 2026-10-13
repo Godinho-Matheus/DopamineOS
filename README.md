@@ -1,8 +1,10 @@
-# 🎮 DopamineOS
+# 🎮 LumeOS
 
-**DopamineOS** é um rastreador de hábitos gamificado. A ideia é simples: você transforma tarefas da vida real (treinar, ler, dormir, beber água) em "missões" de RPG. Ao concluir cada missão você ganha XP, moedas, sobe de nível e evolui os atributos do seu personagem.
+**LumeOS** é um rastreador de hábitos gamificado. A ideia é simples: você transforma tarefas da vida real (treinar, ler, dormir, beber água) em "missões" de RPG. Ao concluir cada missão você ganha XP, moedas, sobe de nível e evolui os atributos do seu personagem.
 
 É um projeto full-stack com **Spring Boot** (backend) e **Angular** (frontend).
+
+> ℹ️ **Evolução do projeto:** o LumeOS nasceu da base originalmente chamada **DopamineOS**. O produto foi renomeado para LumeOS; eventuais referências históricas ao nome anterior são mantidas apenas por contexto.
 
 ---
 
@@ -20,7 +22,7 @@
 
 ## 🔎 Visão geral
 
-O DopamineOS é um app de **um único jogador** (single-player). Existe apenas um personagem no banco de dados por vez. O fluxo básico é:
+O LumeOS é um app de **um único jogador** (single-player). Existe apenas um personagem no banco de dados por vez. O fluxo básico é:
 
 1. **Setup** — você cria o personagem escolhendo nome e uma classe de RPG (Guerreiro, Mago ou Ladino) e seleciona missões iniciais.
 2. **Dashboard** — visualiza status (HP, MP, XP, nível), um gráfico de radar dos atributos e a lista de missões do dia.
@@ -117,9 +119,9 @@ Define a recompensa de cada missão:
 ## 📁 Estrutura de pastas
 
 ```
-DopamineOS/
+LumeOS/
 ├── backend/                          # API Spring Boot
-│   ├── src/main/java/com/dopamineos/backend/
+│   ├── src/main/java/com/lumeos/backend/
 │   │   ├── BackendApplication.java   # Ponto de entrada
 │   │   ├── config/
 │   │   │   ├── CorsConfig.java       # Libera acesso do frontend (CORS)

@@ -9,11 +9,11 @@
         <version>3.3.1</version> <relativePath/>
     </parent>
     
-    <groupId>com.dopamineos</groupId>
-    <artifactId>backend</artifactId>
+    <groupId>com.lumeos</groupId>
+    <artifactId>lumeos-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>backend</name>
-    <description>API para o DopamineOS</description>
+    <name>lumeos-backend</name>
+    <description>API para o LumeOS</description>
 
     <properties>
         <java.version>21</java.version>
